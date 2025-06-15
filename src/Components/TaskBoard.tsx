@@ -43,8 +43,8 @@ export default function TaskBoard({ todos, boardType, boardName, onAdd, onDelete
                                                 onClick={() => onToggle(todo.id)}>
                                                 {
                                                     boardType === 'active' ?
-                                                        'Move to Already Have' :
-                                                        'Move to Need to Get'
+                                                        'Did' :
+                                                        'Redo'
                                                 }
                                             </Button>
                                             <TextField

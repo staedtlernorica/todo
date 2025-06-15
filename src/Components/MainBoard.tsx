@@ -38,7 +38,7 @@ export default function MainBoard() {
         <Box className="main-board flex">
             <TaskBoard
                 boardType={'active'}
-                boardName={'Need To Get'}
+                boardName={'Do'}
                 todos={activeTodos}
                 onAdd={(text) => addTodo(text, false)} // Not completed
                 onDelete={deleteTodo}
@@ -48,7 +48,7 @@ export default function MainBoard() {
             />
             <TaskBoard
                 boardType={'completed'}
-                boardName={'Already Have'}
+                boardName={'Done'}
                 todos={completedTodos}
                 onAdd={(text) => addTodo(text, true)} // Completed!
                 onDelete={deleteTodo}
