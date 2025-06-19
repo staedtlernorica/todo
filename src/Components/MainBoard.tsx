@@ -1,61 +1,92 @@
-import { Box } from '@mui/material';
-import TaskBoard from './TaskBoard';
-import { useTodos } from '../hooks/useTodos';
+import { useState, useEffect } from "react";
+import TaskBoard from "./TaskBoard";
+import { Box, Stack, Typography } from "@mui/material";
+import { v4 as uuidv4 } from 'uuid';
+
+var ALL_TASKS = [
+    { task: "1", status: "todo", id: 1 },
+    { task: "2", status: "todo", id: 12 },
+    { task: "2", status: "todo", id: 124 },
+    { task: "1", status: "done", id: 123 },]
+
+// localStorage.setItem("kanban_todo", JSON.stringify(ALL_TASKS))
+const KANBAN_TODO = JSON.parse(localStorage.getItem('kanban_todo') ?? JSON.stringify(ALL_TASKS))
 
 export default function MainBoard() {
-    const { todos, addTodo, deleteTodo, toggleComplete, editTodo, setTodos } = useTodos();
 
-    const activeTodos = todos.filter((t) => !t.completed);
-    const completedTodos = todos.filter((t) => t.completed);
+    const [tasks, setTasks] = useState(KANBAN_TODO)
 
-    // Helper to reorder a list
-    const reorderTodos = (list, startIndex, endIndex) => {
-        const result = Array.from(list);
-        const [removed] = result.splice(startIndex, 1);
-        result.splice(endIndex, 0, removed);
-        return result;
+    const addTask = (task, boardType) => {
+        const newTask = {
+            task: task,
+            status: boardType,
+            id: uuidv4() // Generate a unique ID for the new task
+        }
+        setTasks(() => {
+            return [...tasks, newTask];
+        })
+
+        localStorage.setItem("kanban_todo", JSON.stringify([...tasks, newTask]))
+    }
+
+    const updateTask = (taskId, newValue, boardType) => {
+        setTasks(tasks.map(task => {
+            if (task.id === taskId) {
+                task.task = newValue;
+                task.status = boardType;
+                return task;
+            }
+            return task;
+        }))
+
+        console.log("Updated Task", taskId, newValue, boardType)
+
+        localStorage.setItem("kanban_todo", JSON.stringify(tasks))
+    }
+
+    const deleteTask = (taskId) => {
+        setTasks(prevTasks => {
+            const updatedTasks = prevTasks.filter(task => task.id !== taskId);
+            localStorage.setItem("kanban_todo", JSON.stringify(updatedTasks));
+            return updatedTasks;
+        });
     };
 
-    // Robust reorder handler: reorders in the main todos array, not just filtered lists
-    const handleReorder = (type: 'active' | 'completed') => (startIndex, endIndex) => {
-        // Find indices of the filtered group in the main todos array
-        const indices = todos
-            .map((t, i) => ({ ...t, i }))
-            .filter((t) => (type === 'active' ? !t.completed : t.completed))
-            .map((t) => t.i);
-
-        const from = indices[startIndex];
-        const to = indices[endIndex];
-
-        const newTodos = Array.from(todos);
-        const [removed] = newTodos.splice(from, 1);
-        newTodos.splice(to, 0, removed);
-
-        setTodos(newTodos);
-    };
 
     return (
-        <Box className="main-board flex">
-            <TaskBoard
-                boardType={'active'}
-                boardName={'Do'}
-                todos={activeTodos}
-                onAdd={(text) => addTodo(text, false)} // Not completed
-                onDelete={deleteTodo}
-                onEdit={editTodo}
-                onToggle={toggleComplete}
-                onReorder={handleReorder('active')}
-            />
-            <TaskBoard
-                boardType={'completed'}
-                boardName={'Done'}
-                todos={completedTodos}
-                onAdd={(text) => addTodo(text, true)} // Completed!
-                onDelete={deleteTodo}
-                onEdit={editTodo}
-                onToggle={toggleComplete}
-                onReorder={handleReorder('completed')}
-            />
-        </Box>
-    );
+        <>
+            <Box
+                className="flex flex-col">
+                <Typography variant="h4" className="text-center">
+                    To Do
+                </Typography>
+                <TaskBoard
+
+                    tasks={tasks.filter(task => task.status === "todo")}
+                    deleteTask={deleteTask}
+                    updateTask={updateTask}
+                    addTask={addTask}
+                    boardType="todo"
+                >
+                </TaskBoard>
+
+            </Box>
+            <Box
+                className="flex flex-col">
+                <Typography variant="h4" className="text-center">
+                    Done
+                </Typography>
+                <TaskBoard
+                    tasks={tasks.filter(task => task.status === "done")}
+                    deleteTask={deleteTask}
+                    updateTask={updateTask}
+                    addTask={addTask}
+                    boardType="done"
+                >
+                </TaskBoard>
+            </Box>
+        </>
+    )
+
+
 }

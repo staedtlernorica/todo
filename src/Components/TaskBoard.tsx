@@ -1,81 +1,32 @@
-import { useState } from 'react';
-import { Box, Button, List, ListItem, ListItemIcon, TextField } from '@mui/material';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import Task from "./Task"
+import NewTask from "./NewTask"
+import { Box, Divider } from "@mui/material"
 
-export default function TaskBoard({ todos, boardType, boardName, onAdd, onDelete, onEdit, onToggle, onReorder }) {
-    const [input, setInput] = useState('');
-
-    const handleAdd = () => {
-        if (!input.trim()) return;
-        onAdd(input);
-        setInput('');
-    };
-
-    const handleDragEnd = (result: DropResult) => {
-        if (!result.destination) return;
-        if (result.source.index === result.destination.index) return;
-        onReorder(result.source.index, result.destination.index);
-    };
-
+export default function TaskBoard({ tasks, addTask, deleteTask, updateTask, toggleTaskStatus, boardType }) {
     return (
-        <Box sx={{ margin: '20px 0' }}>
-            <h2>{boardName}</h2>
+        <>
+            <Box className="flex flex-col">
+                {
+                    tasks.map((task, index) => (
+                        <Task
+                            key={task.id}
+                            task={task.task}
+                            taskId={task.id}
+                            status={task.status}
+                            deleteTask={deleteTask}
+                            updateTask={updateTask}
+                            toggleTaskStatus={toggleTaskStatus}
+                        />
+                    ))
+                }
+                {/* MUI style > Tailwind for Divider margin */}
+                <Divider variant="middle" sx={{ my: 4 }} />
 
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId={boardType}>
-                    {(provided) => (
-                        <List
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                        >
-                            {todos.map((todo, index) => (
-                                <Draggable key={todo.id} draggableId={todo.id} index={index}>
-                                    {(provided) => (
-                                        <ListItem
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            dense
-                                        >
-                                            <ListItemIcon />
-                                            <Button
-                                                variant='contained'
-                                                onClick={() => onToggle(todo.id)}>
-                                                {
-                                                    boardType === 'active' ?
-                                                        'Did' :
-                                                        'Redo'
-                                                }
-                                            </Button>
-                                            <TextField
-                                                id="outlined-basic"
-                                                variant="outlined"
-                                                value={todo.text}
-                                                onChange={(e) => onEdit(todo.id, e.target.value)}
-                                                size="small"
-                                            />
-                                            <Button variant='contained' onClick={() => onDelete(todo.id)}>Delete</Button>
-                                        </ListItem>
-                                    )}
-                                </Draggable>
-                            ))}
-                            {provided.placeholder}
-                        </List>
-                    )}
-                </Droppable>
-            </DragDropContext>
-
-            {onAdd && (
-                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                    <TextField
-                        placeholder="Add a new task"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        size="small"
-                    />
-                    <Button variant="contained" onClick={handleAdd}>Add</Button>
-                </Box>
-            )}
-        </Box>
-    );
+                <NewTask
+                    addTask={addTask}
+                    boardType={boardType}>
+                </NewTask>
+            </Box>
+        </>
+    )
 }
