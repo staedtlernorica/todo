@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Button, TextField } from '@mui/material';
-import type { NewTaskProps, InputChangeEvent } from '../type';
+import type { NewTaskProps, InputChangeEvent } from '../types';
 
 
 export default function NewTask({ addTask, boardType }: NewTaskProps) {

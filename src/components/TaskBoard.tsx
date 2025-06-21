@@ -1,7 +1,7 @@
 import Task from "./Task"
 import NewTask from "./NewTask"
 import { Box, Divider } from "@mui/material"
-import type { TaskBoardProps } from "../type"
+import type { TaskBoardProps } from "../types"
 
 export default function TaskBoard({ tasks, addTask, deleteTask, updateTask, boardType }: TaskBoardProps) {
     return (

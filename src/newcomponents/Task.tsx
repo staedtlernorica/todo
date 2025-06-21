@@ -1,7 +1,7 @@
 import { Box, Button, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
-import type { TaskProps, InputChangeEvent } from '../type';
+import type { TaskProps, InputChangeEvent } from '../types';
 
 export default function Task({ task, taskId, status, deleteTask, updateTask }: TaskProps) {
     const [taskValue, setTaskValue] = useState(task)
