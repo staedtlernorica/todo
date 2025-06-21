@@ -1,5 +1,5 @@
 import './index.css'
-import MainBoard from './components/MainBoard';
+import MainBoard from './newcomponents/MainBoard';
 
 
 export default function App() {
