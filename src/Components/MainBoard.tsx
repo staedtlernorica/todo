@@ -1,36 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, } from "react";
 import TaskBoard from "./TaskBoard";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { v4 as uuidv4 } from 'uuid';
+
+type Task = {
+    task: string;
+    status: string;
+    id: string;
+};
+type boardType = "todo" | "done";
 
 var ALL_TASKS = [
     { task: "1", status: "todo", id: 1 },
     { task: "2", status: "todo", id: 12 },
     { task: "2", status: "todo", id: 124 },
     { task: "1", status: "done", id: 123 },]
-
 // localStorage.setItem("kanban_todo", JSON.stringify(ALL_TASKS))
 const KANBAN_TODO = JSON.parse(localStorage.getItem('kanban_todo') ?? JSON.stringify(ALL_TASKS))
 
 export default function MainBoard() {
-
     const [tasks, setTasks] = useState(KANBAN_TODO)
-
-    const addTask = (task, boardType) => {
+    const addTask = (task: string, boardType: boardType) => {
         const newTask = {
             task: task,
             status: boardType,
             id: uuidv4() // Generate a unique ID for the new task
         }
-        setTasks(() => {
-            return [...tasks, newTask];
-        })
-
-        localStorage.setItem("kanban_todo", JSON.stringify([...tasks, newTask]))
+        const newList = [...tasks, newTask]
+        setTasks(newList)
+        localStorage.setItem("kanban_todo", JSON.stringify(newList))
     }
 
-    const updateTask = (taskId, newValue, boardType) => {
-        setTasks(tasks.map(task => {
+    const updateTask = (taskId: string, newValue: string, boardType: boardType) => {
+        setTasks(tasks.map((task: Task) => {
             if (task.id === taskId) {
                 task.task = newValue;
                 task.status = boardType;
@@ -38,20 +40,16 @@ export default function MainBoard() {
             }
             return task;
         }))
-
-        console.log("Updated Task", taskId, newValue, boardType)
-
         localStorage.setItem("kanban_todo", JSON.stringify(tasks))
     }
 
-    const deleteTask = (taskId) => {
-        setTasks(prevTasks => {
-            const updatedTasks = prevTasks.filter(task => task.id !== taskId);
-            localStorage.setItem("kanban_todo", JSON.stringify(updatedTasks));
+    const deleteTask = (taskId: string) => {
+        setTasks(() => {
+            const updatedTasks: Task[] = tasks.filter((task: Task) => task.id !== taskId);
             return updatedTasks;
         });
+        localStorage.setItem("kanban_todo", JSON.stringify(tasks));
     };
-
 
     return (
         <>
@@ -61,8 +59,7 @@ export default function MainBoard() {
                     To Do
                 </Typography>
                 <TaskBoard
-
-                    tasks={tasks.filter(task => task.status === "todo")}
+                    tasks={tasks.filter((task: Task) => task.status === "todo")}
                     deleteTask={deleteTask}
                     updateTask={updateTask}
                     addTask={addTask}
@@ -77,7 +74,7 @@ export default function MainBoard() {
                     Done
                 </Typography>
                 <TaskBoard
-                    tasks={tasks.filter(task => task.status === "done")}
+                    tasks={tasks.filter((task: Task) => task.status === "done")}
                     deleteTask={deleteTask}
                     updateTask={updateTask}
                     addTask={addTask}

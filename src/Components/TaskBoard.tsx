@@ -2,12 +2,28 @@ import Task from "./Task"
 import NewTask from "./NewTask"
 import { Box, Divider } from "@mui/material"
 
-export default function TaskBoard({ tasks, addTask, deleteTask, updateTask, toggleTaskStatus, boardType }) {
+type TaskType = {
+    id: string;
+    task: string;
+    status: boardType;
+};
+
+type TaskBoardProps = {
+    tasks: TaskType[];
+    addTask: (task: string, boardType: boardType) => void;
+    deleteTask: (taskId: string) => void;
+    updateTask: (taskId: string, newValue: string, boardType: boardType) => void;
+    boardType: boardType;
+};
+
+type boardType = "todo" | "done";
+
+export default function TaskBoard({ tasks, addTask, deleteTask, updateTask, boardType }: TaskBoardProps) {
     return (
         <>
             <Box className="flex flex-col">
                 {
-                    tasks.map((task, index) => (
+                    tasks.map((task) => (
                         <Task
                             key={task.id}
                             task={task.task}
@@ -15,7 +31,6 @@ export default function TaskBoard({ tasks, addTask, deleteTask, updateTask, togg
                             status={task.status}
                             deleteTask={deleteTask}
                             updateTask={updateTask}
-                            toggleTaskStatus={toggleTaskStatus}
                         />
                     ))
                 }

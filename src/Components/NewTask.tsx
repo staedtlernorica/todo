@@ -1,24 +1,30 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Stack } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 
-export default function NewTask({ addTask, boardType }) {
+interface NewTaskProps {
+    addTask: (task: string, boardType: boardType) => void;
+    boardType: boardType;
+}
+interface InputChangeEvent {
+    target: { value: string };
+}
 
+type boardType = "todo" | "done";
+
+export default function NewTask({ addTask, boardType }: NewTaskProps) {
     const [newTask, setNewTask] = useState('');
-
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: InputChangeEvent) => {
         setNewTask(e.target.value);
     };
-
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleAddTask();
+        }
+    };
     const handleAddTask = () => {
         if (newTask.trim() !== '') {
             addTask(newTask, boardType);
             setNewTask(''); // Clear the input field after adding
-        }
-    };
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            handleAddTask();
         }
     };
 

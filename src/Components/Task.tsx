@@ -1,24 +1,33 @@
-import { Box, Button, TextField, Stack } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
 
-export default function Task({ task, taskId, status, deleteTask, updateTask, toggleTaskStatus }) {
+interface TaskProps {
+    task: string;
+    taskId: string;
+    status: boardType;
+    deleteTask: (taskId: string) => void;
+    updateTask: (taskId: string, newValue: string, boardType: boardType) => void;
+}
 
+interface InputChangeEvent {
+    target: { value: string };
+}
+
+type boardType = "todo" | "done";
+
+export default function Task({ task, taskId, status, deleteTask, updateTask }: TaskProps) {
     const [taskValue, setTaskValue] = useState(task)
     const [taskStatus, setTaskStatus] = useState(status)
-
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: InputChangeEvent) => {
         setTaskValue(e.target.value)
-        console.log(taskId, e.target.value, taskStatus)
         updateTask(taskId, e.target.value, taskStatus); // Call the parent's setInputValue
     };
-
     const handleStatusChange = () => {
         const newStatus = taskStatus === 'done' ? 'todo' : 'done';
         setTaskStatus(newStatus);
         updateTask(taskId, taskValue, newStatus); // Use the updated status directly
     }
-
 
     return (
         <>
