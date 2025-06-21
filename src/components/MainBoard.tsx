@@ -2,7 +2,7 @@ import { useState, } from "react";
 import TaskBoard from "./TaskBoard";
 import { Box, Typography } from "@mui/material";
 import { v4 as uuidv4 } from 'uuid';
-import type { Task, boardType } from "../type";
+import type { Task, boardType } from "../types";
 
 const ALL_TASKS = [
     { task: "1", status: "todo", id: 1 },
