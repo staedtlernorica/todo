@@ -2,20 +2,13 @@ import { useState, } from "react";
 import TaskBoard from "./TaskBoard";
 import { Box, Typography } from "@mui/material";
 import { v4 as uuidv4 } from 'uuid';
+import type { Task, boardType } from "../type";
 
-type Task = {
-    task: string;
-    status: string;
-    id: string;
-};
-type boardType = "todo" | "done";
-
-var ALL_TASKS = [
+const ALL_TASKS = [
     { task: "1", status: "todo", id: 1 },
     { task: "2", status: "todo", id: 12 },
     { task: "2", status: "todo", id: 124 },
     { task: "1", status: "done", id: 123 },]
-// localStorage.setItem("kanban_todo", JSON.stringify(ALL_TASKS))
 const KANBAN_TODO = JSON.parse(localStorage.getItem('kanban_todo') ?? JSON.stringify(ALL_TASKS))
 
 export default function MainBoard() {
@@ -24,7 +17,7 @@ export default function MainBoard() {
         const newTask = {
             task: task,
             status: boardType,
-            id: uuidv4() // Generate a unique ID for the new task
+            id: uuidv4()
         }
         const newList = [...tasks, newTask]
         setTasks(newList)

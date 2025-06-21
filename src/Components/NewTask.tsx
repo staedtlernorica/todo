@@ -1,15 +1,7 @@
 import { useState } from 'react';
 import { Box, Button, TextField } from '@mui/material';
+import type { NewTaskProps, InputChangeEvent } from '../type';
 
-interface NewTaskProps {
-    addTask: (task: string, boardType: boardType) => void;
-    boardType: boardType;
-}
-interface InputChangeEvent {
-    target: { value: string };
-}
-
-type boardType = "todo" | "done";
 
 export default function NewTask({ addTask, boardType }: NewTaskProps) {
     const [newTask, setNewTask] = useState('');
