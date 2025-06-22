@@ -1,82 +1,134 @@
-import { useState, } from "react";
+import { useState } from "react";
 import TaskBoard from "./TaskBoard";
 import { Box, Typography } from "@mui/material";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 
-const ALL_TASKS = [
-    { task: "1", status: "todo", id: 1 },
-    { task: "2", status: "todo", id: 12 },
-    { task: "2", status: "todo", id: 124 },
-    { task: "1", status: "done", id: 123 },]
-const KANBAN_TODO = JSON.parse(localStorage.getItem('kanban_todo') ?? JSON.stringify(ALL_TASKS))
+const TODO_LIST = JSON.parse(
+  localStorage.getItem("todo_list") ??
+    JSON.stringify([{ task: "1", status: "todo", id: 1 }])
+);
+const DONE_LIST = JSON.parse(
+  localStorage.getItem("done_list") ??
+    JSON.stringify([{ task: "1", status: "done", id: 1 }])
+);
 
 export default function MainBoard() {
-    const [tasks, setTasks] = useState(KANBAN_TODO)
-    const addTask = (task: string, boardType: boardType) => {
-        const newTask = {
-            task: task,
-            status: boardType,
-            id: uuidv4()
-        }
-        const newList = [...tasks, newTask]
-        setTasks(newList)
-        localStorage.setItem("kanban_todo", JSON.stringify(newList))
-    }
+  const [todoTasks, setTodoTasks] = useState(TODO_LIST);
+  const [doneTasks, setDoneTasks] = useState(DONE_LIST);
 
-    const updateTask = (taskId: string, newValue: string, boardType: boardType) => {
-        setTasks(tasks.map((task: Task) => {
-            if (task.id === taskId) {
-                task.task = newValue;
-                task.status = boardType;
-                return task;
-            }
-            return task;
-        }))
-        localStorage.setItem("kanban_todo", JSON.stringify(tasks))
-    }
+  //   const [tasks, setTasks] = useState(KANBAN_TODO);
 
-    const deleteTask = (taskId: string) => {
-        setTasks(() => {
-            const updatedTasks: Task[] = tasks.filter((task: Task) => task.id !== taskId);
-            return updatedTasks;
-        });
-        localStorage.setItem("kanban_todo", JSON.stringify(tasks));
+  const addTask = (task: string, boardType: boardType, taskId?: string) => {
+    const newTask = {
+      task: task,
+      status: boardType,
+      id: taskId || uuidv4(),
     };
+    // const newList = [...tasks, newTask];
+    // setTasks(newList);
+    if (boardType === "todo") {
+      setTodoTasks([...todoTasks, newTask]);
+      localStorage.setItem(
+        "todo_list",
+        JSON.stringify([...todoTasks, newTask])
+      );
+    } else {
+      setDoneTasks([...doneTasks, newTask]);
+      localStorage.setItem(
+        "done_list",
+        JSON.stringify([...doneTasks, newTask])
+      );
+    }
+  };
 
-    return (
-        <>
-            <Box
-                className="flex flex-col">
-                <Typography variant="h4" className="text-center">
-                    To Do
-                </Typography>
-                <TaskBoard
-                    tasks={tasks.filter((task: Task) => task.status === "todo")}
-                    deleteTask={deleteTask}
-                    updateTask={updateTask}
-                    addTask={addTask}
-                    boardType="todo"
-                >
-                </TaskBoard>
+  const updateTaskValue = (
+    taskId: string,
+    newValue: string,
+    boardType: boardType
+  ) => {
+    if (boardType === "todo") {
+      setTaskValue(setTodoTasks, todoTasks, taskId, newValue, "todo_list");
+    } else {
+      setTaskValue(setDoneTasks, doneTasks, taskId, newValue, "done_list");
+    }
+  };
 
-            </Box>
-            <Box
-                className="flex flex-col">
-                <Typography variant="h4" className="text-center">
-                    Done
-                </Typography>
-                <TaskBoard
-                    tasks={tasks.filter((task: Task) => task.status === "done")}
-                    deleteTask={deleteTask}
-                    updateTask={updateTask}
-                    addTask={addTask}
-                    boardType="done"
-                >
-                </TaskBoard>
-            </Box>
-        </>
-    )
+  const setTaskValue = (
+    taskSetter: React.Dispatch<React.SetStateAction<Task[]>>,
+    tasks: Task[],
+    taskId: string,
+    newValue: string,
+    storageKey: string
+  ) => {
+    const newList = tasks.map((task: Task) => {
+      if (task.id === taskId) {
+        return { ...task, task: newValue };
+      }
+      return task;
+    });
+    taskSetter(newList);
+    localStorage.setItem(storageKey, JSON.stringify(newList));
+  };
 
+  const updateTaskStatus = (
+    task: string,
+    taskId: string,
+    newBoardType: boardType
+  ) => {
+    if (newBoardType === "todo") {
+      addTask(task, newBoardType, taskId);
+      deleteTask(taskId, "done");
+    } else {
+      addTask(task, newBoardType, taskId);
+      deleteTask(taskId, "todo");
+    }
+  };
 
+  const deleteTask = (taskId: string, boardType: boardType) => {
+    if (boardType === "todo") {
+      const updatedTasks: Task[] = todoTasks.filter(
+        (task: Task) => task.id !== taskId
+      );
+      setTodoTasks(updatedTasks);
+      localStorage.setItem("todo_list", JSON.stringify(updatedTasks));
+    } else {
+      const updatedTasks: Task[] = doneTasks.filter(
+        (task: Task) => task.id !== taskId
+      );
+      setDoneTasks(updatedTasks);
+      localStorage.setItem("done_list", JSON.stringify(updatedTasks));
+    }
+  };
+
+  return (
+    <>
+      <Box className="flex flex-col">
+        <Typography variant="h4" className="text-center">
+          To Do
+        </Typography>
+        <TaskBoard
+          tasks={todoTasks}
+          deleteTask={deleteTask}
+          updateTaskValue={updateTaskValue}
+          updateTaskStatus={updateTaskStatus}
+          addTask={addTask}
+          boardType="todo"
+        ></TaskBoard>
+      </Box>
+      <Box className="flex flex-col">
+        <Typography variant="h4" className="text-center">
+          Done
+        </Typography>
+        <TaskBoard
+          tasks={doneTasks}
+          deleteTask={deleteTask}
+          updateTaskValue={updateTaskValue}
+          updateTaskStatus={updateTaskStatus}
+          addTask={addTask}
+          boardType="done"
+        ></TaskBoard>
+      </Box>
+    </>
+  );
 }
