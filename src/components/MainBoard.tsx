@@ -4,15 +4,6 @@ import { Box, Typography } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 
-const ALL_TASKS = [
-  { task: "1", status: "todo", id: 1 },
-  { task: "2", status: "todo", id: 12 },
-  { task: "2", status: "todo", id: 124 },
-  { task: "1", status: "done", id: 123 },
-];
-// const KANBAN_TODO = JSON.parse(
-//   localStorage.getItem("kanban_todo") ?? JSON.stringify(ALL_TASKS)
-// );
 const TODO_LIST = JSON.parse(
   localStorage.getItem("todo_list") ??
     JSON.stringify([{ task: "1", status: "todo", id: 1 }])
