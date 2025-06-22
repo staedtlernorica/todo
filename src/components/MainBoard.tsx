@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TaskBoard from "./TaskBoard";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 
@@ -13,9 +13,16 @@ const DONE_LIST = JSON.parse(
     JSON.stringify([{ task: "1", status: "done", id: 1 }])
 );
 
+const META = JSON.parse(
+  localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
+);
+
 export default function MainBoard() {
   const [todoTasks, setTodoTasks] = useState(TODO_LIST);
   const [doneTasks, setDoneTasks] = useState(DONE_LIST);
+  const [activeBoard, setActiveBoard] = useState(
+    META.lastActiveBoard || "todo"
+  );
 
   //   const [tasks, setTasks] = useState(KANBAN_TODO);
 
@@ -101,34 +108,43 @@ export default function MainBoard() {
     }
   };
 
+  const switchBoard = () => {
+    setActiveBoard(activeBoard === "todo" ? "done" : "todo");
+  };
+
   return (
     <>
       <Box className="flex flex-col">
         <Typography variant="h4" className="text-center">
-          To Do
+          {activeBoard === "todo" ? "To Do" : "Done"}
         </Typography>
-        <TaskBoard
-          tasks={todoTasks}
-          deleteTask={deleteTask}
-          updateTaskValue={updateTaskValue}
-          updateTaskStatus={updateTaskStatus}
-          addTask={addTask}
-          boardType="todo"
-        ></TaskBoard>
+        {activeBoard === "todo" ? (
+          <>
+            <TaskBoard
+              tasks={todoTasks}
+              boardType="todo"
+              deleteTask={deleteTask}
+              updateTaskValue={updateTaskValue}
+              updateTaskStatus={updateTaskStatus}
+              addTask={addTask}
+            ></TaskBoard>
+          </>
+        ) : (
+          <>
+            <TaskBoard
+              tasks={doneTasks}
+              boardType="done"
+              deleteTask={deleteTask}
+              updateTaskValue={updateTaskValue}
+              updateTaskStatus={updateTaskStatus}
+              addTask={addTask}
+            ></TaskBoard>
+          </>
+        )}
       </Box>
-      <Box className="flex flex-col">
-        <Typography variant="h4" className="text-center">
-          Done
-        </Typography>
-        <TaskBoard
-          tasks={doneTasks}
-          deleteTask={deleteTask}
-          updateTaskValue={updateTaskValue}
-          updateTaskStatus={updateTaskStatus}
-          addTask={addTask}
-          boardType="done"
-        ></TaskBoard>
-      </Box>
+      <Button variant="contained" onClick={switchBoard}>
+        Go to {activeBoard === "todo" ? "Done" : "To Do"}
+      </Button>
     </>
   );
 }

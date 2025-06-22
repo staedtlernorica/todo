@@ -1,5 +1,7 @@
 import { Box, Button, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DoneIcon from "@mui/icons-material/Done";
+import RedoIcon from "@mui/icons-material/Redo";
 import { useState } from "react";
 import type { TaskProps, InputChangeEvent } from "../types";
 
@@ -26,22 +28,22 @@ export default function Task({
   return (
     <>
       <Box className="flex align-items-center">
-        <Button
-          className="m-3 flex-1"
-          variant="contained"
-          onClick={handleStatusChange}
-        >
-          {taskStatus == "done" ? "Do again" : "Finished"}
-        </Button>
         <TextField
-          className="m-3 flex-8"
+          className="m-3"
           variant="standard"
           value={taskValue}
           onChange={handleInputChange}
           style={{ margin: "10px 0" }}
         />
         <Button
-          className="m-3 p-0 flex-1"
+          className="m-3"
+          variant="contained"
+          onClick={handleStatusChange}
+        >
+          {taskStatus == "done" ? <RedoIcon></RedoIcon> : <DoneIcon></DoneIcon>}
+        </Button>
+        <Button
+          className="m-3"
           variant="contained"
           onClick={() => deleteTask(taskId, taskStatus)}
         >

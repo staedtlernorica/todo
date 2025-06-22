@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import type { NewTaskProps, InputChangeEvent } from "../types";
+import AddTaskIcon from "@mui/icons-material/AddTask";
 
 export default function NewTask({ addTask, boardType }: NewTaskProps) {
   const [newTask, setNewTask] = useState("");
@@ -31,7 +32,7 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
           style={{ margin: "10px 0" }}
         />
         <Button variant="contained" onClick={handleAddTask}>
-          Add Task
+          <AddTaskIcon></AddTaskIcon>
         </Button>
       </Box>
     </>
