@@ -3,6 +3,7 @@ import TaskBoard from "./TaskBoard";
 import { Box, Typography, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
+import Slide from "@mui/material/Slide";
 
 const TODO_LIST = JSON.parse(
   localStorage.getItem("todo_list") ??
