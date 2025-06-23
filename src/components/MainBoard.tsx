@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TaskBoard from "./TaskBoard";
-import { Box, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 
@@ -13,11 +13,16 @@ const DONE_LIST = JSON.parse(
     JSON.stringify([{ task: "1", status: "done", id: 1 }])
 );
 
+const META = JSON.parse(
+  localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
+);
+
 export default function MainBoard() {
   const [todoTasks, setTodoTasks] = useState(TODO_LIST);
   const [doneTasks, setDoneTasks] = useState(DONE_LIST);
-
-  //   const [tasks, setTasks] = useState(KANBAN_TODO);
+  const [activeBoard, setActiveBoard] = useState(
+    META.lastActiveBoard || "todo"
+  );
 
   const addTask = (task: string, boardType: boardType, taskId?: string) => {
     const newTask = {
@@ -25,8 +30,6 @@ export default function MainBoard() {
       status: boardType,
       id: taskId || uuidv4(),
     };
-    // const newList = [...tasks, newTask];
-    // setTasks(newList);
     if (boardType === "todo") {
       setTodoTasks([...todoTasks, newTask]);
       localStorage.setItem(
@@ -101,33 +104,56 @@ export default function MainBoard() {
     }
   };
 
+  const switchBoard = () => {
+    setActiveBoard(activeBoard === "todo" ? "done" : "todo");
+  };
+
   return (
     <>
-      <Box className="flex flex-col">
-        <Typography variant="h4" className="text-center">
-          To Do
-        </Typography>
-        <TaskBoard
-          tasks={todoTasks}
-          deleteTask={deleteTask}
-          updateTaskValue={updateTaskValue}
-          updateTaskStatus={updateTaskStatus}
-          addTask={addTask}
-          boardType="todo"
-        ></TaskBoard>
-      </Box>
-      <Box className="flex flex-col">
-        <Typography variant="h4" className="text-center">
-          Done
-        </Typography>
-        <TaskBoard
-          tasks={doneTasks}
-          deleteTask={deleteTask}
-          updateTaskValue={updateTaskValue}
-          updateTaskStatus={updateTaskStatus}
-          addTask={addTask}
-          boardType="done"
-        ></TaskBoard>
+      <Box className="flex flex-col h-screen justify-between pt-5">
+        {/* <Typography
+          variant="h4"
+          className="text-center sticky top-0 bg-white p-3"
+        >
+          Grocery List
+        </Typography> */}
+        {activeBoard === "todo" ? (
+          <>
+            <TaskBoard
+              tasks={todoTasks}
+              boardType="todo"
+              deleteTask={deleteTask}
+              updateTaskValue={updateTaskValue}
+              updateTaskStatus={updateTaskStatus}
+              addTask={addTask}
+            ></TaskBoard>
+          </>
+        ) : (
+          <>
+            <TaskBoard
+              tasks={doneTasks}
+              boardType="done"
+              deleteTask={deleteTask}
+              updateTaskValue={updateTaskValue}
+              updateTaskStatus={updateTaskStatus}
+              addTask={addTask}
+            ></TaskBoard>
+          </>
+        )}
+        <Box className="sticky bottom-0 justify-self-end flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100">
+          <Button
+            variant={activeBoard === "todo" ? "contained" : "outlined"}
+            onClick={activeBoard === "done" ? switchBoard : undefined}
+          >
+            To Do
+          </Button>
+          <Button
+            variant={activeBoard === "done" ? "contained" : "outlined"}
+            onClick={activeBoard === "todo" ? switchBoard : undefined}
+          >
+            Done
+          </Button>
+        </Box>
       </Box>
     </>
   );

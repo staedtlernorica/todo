@@ -1,6 +1,6 @@
 import Task from "./Task";
 import NewTask from "./NewTask";
-import { Box, Divider } from "@mui/material";
+import { Box } from "@mui/material";
 import type { TaskBoardProps } from "../types";
 
 export default function TaskBoard({
@@ -14,8 +14,9 @@ export default function TaskBoard({
   return (
     <>
       <Box className="flex flex-col">
-        {tasks.map((task) => (
+        {tasks.map((task, index) => (
           <Task
+            index={index}
             key={task.id}
             task={task.task}
             taskId={task.id}
@@ -25,9 +26,6 @@ export default function TaskBoard({
             updateTaskStatus={updateTaskStatus}
           />
         ))}
-        {/* MUI style > Tailwind for Divider margin */}
-        <Divider variant="middle" sx={{ my: 4 }} />
-
         <NewTask addTask={addTask} boardType={boardType}></NewTask>
       </Box>
     </>
