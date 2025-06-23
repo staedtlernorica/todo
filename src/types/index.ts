@@ -10,6 +10,7 @@ export interface InputChangeEvent {
 export type boardType = "todo" | "done";
 
 export interface TaskProps {
+  index: number;
   task: string;
   taskId: string;
   status: boardType;

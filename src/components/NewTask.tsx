@@ -1,40 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import type { NewTaskProps, InputChangeEvent } from "../types";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 
 export default function NewTask({ addTask, boardType }: NewTaskProps) {
   const [newTask, setNewTask] = useState("");
+  const didJustAddTask = useRef(false); // ✅ new flag
+
   const handleInputChange = (e: InputChangeEvent) => {
     setNewTask(e.target.value);
   };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleAddTask();
     }
   };
+
   const handleAddTask = () => {
     if (newTask.trim() !== "") {
       addTask(newTask, boardType);
-      setNewTask(""); // Clear the input field after adding
+      setNewTask("");
+      didJustAddTask.current = true; // ✅ set the flag
     }
   };
 
+  // ✅ Scroll only after a task is added — and not on page load
+  useEffect(() => {
+    if (didJustAddTask.current) {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth",
+      });
+      didJustAddTask.current = false; // reset flag
+    }
+  });
+
   return (
-    <>
-      <Box className="flex justify-center">
-        <TextField
-          variant="filled"
-          placeholder="Add new task"
-          value={newTask}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          style={{ margin: "10px 0" }}
-        />
-        <Button variant="contained" onClick={handleAddTask}>
-          <AddTaskIcon></AddTaskIcon>
-        </Button>
-      </Box>
-    </>
+    <Box className="flex justify-center items-center sticky bottom-17 bg-white mt-4">
+      <TextField
+        variant="filled"
+        placeholder="Add new task"
+        value={newTask}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        style={{ margin: "10px 0" }}
+      />
+      <Button
+        className="ml-5 h-10 w-10 min-w-0"
+        variant="contained"
+        onClick={handleAddTask}
+      >
+        <AddTaskIcon />
+      </Button>
+    </Box>
   );
 }

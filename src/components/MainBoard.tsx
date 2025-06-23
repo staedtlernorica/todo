@@ -1,9 +1,8 @@
 import { useState } from "react";
 import TaskBoard from "./TaskBoard";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
-import Slide from "@mui/material/Slide";
 
 const TODO_LIST = JSON.parse(
   localStorage.getItem("todo_list") ??
@@ -25,16 +24,12 @@ export default function MainBoard() {
     META.lastActiveBoard || "todo"
   );
 
-  //   const [tasks, setTasks] = useState(KANBAN_TODO);
-
   const addTask = (task: string, boardType: boardType, taskId?: string) => {
     const newTask = {
       task: task,
       status: boardType,
       id: taskId || uuidv4(),
     };
-    // const newList = [...tasks, newTask];
-    // setTasks(newList);
     if (boardType === "todo") {
       setTodoTasks([...todoTasks, newTask]);
       localStorage.setItem(
@@ -115,10 +110,13 @@ export default function MainBoard() {
 
   return (
     <>
-      <Box className="flex flex-col">
-        <Typography variant="h4" className="text-center">
-          {activeBoard === "todo" ? "To Do" : "Done"}
-        </Typography>
+      <Box className="flex flex-col h-screen justify-between pt-5">
+        {/* <Typography
+          variant="h4"
+          className="text-center sticky top-0 bg-white p-3"
+        >
+          Grocery List
+        </Typography> */}
         {activeBoard === "todo" ? (
           <>
             <TaskBoard
@@ -142,10 +140,21 @@ export default function MainBoard() {
             ></TaskBoard>
           </>
         )}
+        <Box className="sticky bottom-0 justify-self-end flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100">
+          <Button
+            variant={activeBoard === "todo" ? "contained" : "outlined"}
+            onClick={activeBoard === "done" ? switchBoard : undefined}
+          >
+            To Do
+          </Button>
+          <Button
+            variant={activeBoard === "done" ? "contained" : "outlined"}
+            onClick={activeBoard === "todo" ? switchBoard : undefined}
+          >
+            Done
+          </Button>
+        </Box>
       </Box>
-      <Button variant="contained" onClick={switchBoard}>
-        Go to {activeBoard === "todo" ? "Done" : "To Do"}
-      </Button>
     </>
   );
 }
