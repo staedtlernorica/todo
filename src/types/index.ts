@@ -49,3 +49,5 @@ export type Task = {
   id: string;
   status: boardType;
 };
+
+export type BoardSlideDirection = "left | right";
