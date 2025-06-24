@@ -5,7 +5,7 @@ import AddTaskIcon from "@mui/icons-material/AddTask";
 
 export default function NewTask({ addTask, boardType }: NewTaskProps) {
   const [newTask, setNewTask] = useState("");
-  const didJustAddTask = useRef(false); // ✅ new flag
+  const didJustAddTask = useRef(false);
 
   const handleInputChange = (e: InputChangeEvent) => {
     setNewTask(e.target.value);
@@ -21,18 +21,17 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
     if (newTask.trim() !== "") {
       addTask(newTask, boardType);
       setNewTask("");
-      didJustAddTask.current = true; // ✅ set the flag
+      didJustAddTask.current = true;
     }
   };
 
-  // ✅ Scroll only after a task is added — and not on page load
   useEffect(() => {
     if (didJustAddTask.current) {
       window.scrollTo({
         top: document.body.scrollHeight,
         behavior: "smooth",
       });
-      didJustAddTask.current = false; // reset flag
+      didJustAddTask.current = false;
     }
   });
 
@@ -45,7 +44,8 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         style={{ margin: "10px 0" }}
-      />
+      ></TextField>
+
       <Button
         className="ml-5 h-10 w-10 min-w-0"
         variant="contained"

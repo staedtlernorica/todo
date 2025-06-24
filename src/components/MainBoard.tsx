@@ -3,14 +3,13 @@ import TaskBoard from "./TaskBoard";
 import { Box, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
+import Slide from "@mui/material/Slide";
 
 const TODO_LIST = JSON.parse(
-  localStorage.getItem("todo_list") ??
-    JSON.stringify([{ task: "1", status: "todo", id: 1 }])
+  localStorage.getItem("todo_list") ?? JSON.stringify([])
 );
 const DONE_LIST = JSON.parse(
-  localStorage.getItem("done_list") ??
-    JSON.stringify([{ task: "1", status: "done", id: 1 }])
+  localStorage.getItem("done_list") ?? JSON.stringify([])
 );
 
 const META = JSON.parse(
@@ -104,52 +103,68 @@ export default function MainBoard() {
     }
   };
 
-  const switchBoard = () => {
-    setActiveBoard(activeBoard === "todo" ? "done" : "todo");
-  };
+  const boardSlideTiming = 300;
 
   return (
     <>
       <Box className="flex flex-col h-screen justify-between pt-5">
-        {/* <Typography
-          variant="h4"
-          className="text-center sticky top-0 bg-white p-3"
-        >
-          Grocery List
-        </Typography> */}
-        {activeBoard === "todo" ? (
-          <>
-            <TaskBoard
-              tasks={todoTasks}
-              boardType="todo"
-              deleteTask={deleteTask}
-              updateTaskValue={updateTaskValue}
-              updateTaskStatus={updateTaskStatus}
-              addTask={addTask}
-            ></TaskBoard>
-          </>
-        ) : (
-          <>
-            <TaskBoard
-              tasks={doneTasks}
-              boardType="done"
-              deleteTask={deleteTask}
-              updateTaskValue={updateTaskValue}
-              updateTaskStatus={updateTaskStatus}
-              addTask={addTask}
-            ></TaskBoard>
-          </>
-        )}
-        <Box className="sticky bottom-0 justify-self-end flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100">
+        <Box sx={{ position: "relative", height: "100%" }}>
+          <Slide
+            direction="left"
+            in={activeBoard === "todo"}
+            timeout={boardSlideTiming}
+            mountOnEnter
+            unmountOnExit
+            // easing={{
+            //   enter: "cubic-bezier(0, 1.5, .8, 1)",
+            //   exit: "linear",
+            // }}
+          >
+            <div style={{ position: "absolute", width: "100%" }}>
+              <TaskBoard
+                tasks={todoTasks}
+                boardType="todo"
+                deleteTask={deleteTask}
+                updateTaskValue={updateTaskValue}
+                updateTaskStatus={updateTaskStatus}
+                addTask={addTask}
+              />
+            </div>
+          </Slide>
+          <Slide
+            direction="right"
+            in={activeBoard === "done"}
+            timeout={boardSlideTiming}
+            mountOnEnter
+            unmountOnExit
+            // easing={{
+            //   enter: "cubic-bezier(0, 1.5, .8, 1)",
+            //   exit: "linear",
+            // }}
+          >
+            <div style={{ position: "absolute", width: "100%" }}>
+              <TaskBoard
+                tasks={doneTasks}
+                boardType="done"
+                deleteTask={deleteTask}
+                updateTaskValue={updateTaskValue}
+                updateTaskStatus={updateTaskStatus}
+                addTask={addTask}
+              />
+            </div>
+          </Slide>
+        </Box>
+
+        <Box className="sticky bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100">
           <Button
             variant={activeBoard === "todo" ? "contained" : "outlined"}
-            onClick={activeBoard === "done" ? switchBoard : undefined}
+            onClick={() => setActiveBoard("todo")}
           >
             To Do
           </Button>
           <Button
             variant={activeBoard === "done" ? "contained" : "outlined"}
-            onClick={activeBoard === "todo" ? switchBoard : undefined}
+            onClick={() => setActiveBoard("done")}
           >
             Done
           </Button>
