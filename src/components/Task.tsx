@@ -7,6 +7,7 @@ import type { TaskProps, InputChangeEvent } from "../types";
 import Fade from "@mui/material/Fade";
 import Slide from "@mui/material/Slide";
 import React from "react";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 export default function Task({
   index,
@@ -68,9 +69,9 @@ export default function Task({
         >
           <Box className="flex items-center justify-center m-4">
             <Typography className="mr-5">{index + 1}.</Typography>
-            {taskInput(handleInputChange, taskValue)}
-            {taskSwitch(handleSwitch, taskStatus)}
-            {taskDelete(handleDelete)}
+            {TaskInput(handleInputChange, taskValue)}
+            {TaskSwitch(handleSwitch, taskStatus)}
+            {TaskDelete(handleDelete)}
           </Box>
         </Fade>
       </Slide>
@@ -78,21 +79,30 @@ export default function Task({
   );
 }
 
-function taskInput(
+function TaskInput(
   handleInputChange: (e: InputChangeEvent) => void,
   taskValue: string
 ) {
   return (
-    <TextField
-      className=" max-w-80 flex-2"
-      variant="standard"
-      value={taskValue}
-      onChange={handleInputChange}
-      style={{ margin: "10px 0" }}
-    />
+    <>
+      <TextField
+        className=" max-w-80 flex-2"
+        variant="standard"
+        value={taskValue}
+        onChange={handleInputChange}
+        style={{ margin: "10px 0" }}
+      ></TextField>
+      <ContentCopyIcon
+        // className="absolute right-2 top-1/2 transform -translate-y-1/2"
+        className="h-7 w-7 relative bottom-1 right-7 hover:cursor-pointer hover:bottom-0.25"
+        onClick={() => {
+          navigator.clipboard.writeText(taskValue);
+        }}
+      />
+    </>
   );
 }
-function taskSwitch(
+function TaskSwitch(
   handleSwitch: React.MouseEventHandler<HTMLButtonElement> | undefined,
   taskStatus: string
 ) {
@@ -106,7 +116,7 @@ function taskSwitch(
     </Button>
   );
 }
-function taskDelete(handleDelete: () => void) {
+function TaskDelete(handleDelete: () => void) {
   return (
     <Button
       className=" rounded-full h-10 w-10 min-w-0"

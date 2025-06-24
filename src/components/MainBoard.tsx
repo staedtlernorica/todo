@@ -5,12 +5,10 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 
 const TODO_LIST = JSON.parse(
-  localStorage.getItem("todo_list") ??
-    JSON.stringify([{ task: "1", status: "todo", id: 1 }])
+  localStorage.getItem("todo_list") ?? JSON.stringify([])
 );
 const DONE_LIST = JSON.parse(
-  localStorage.getItem("done_list") ??
-    JSON.stringify([{ task: "1", status: "done", id: 1 }])
+  localStorage.getItem("done_list") ?? JSON.stringify([])
 );
 
 const META = JSON.parse(
