@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TaskBoard from "./TaskBoard";
 import { Box, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
+// import { loginWithGoogle } from "../auth/googleSignIn";
+import {
+  auth,
+  provider,
+  signInWithPopup,
+  signOut,
+  db,
+  onAuthStateChanged,
+  // setPersistence,
+  // browserLocalPersistence,
+} from "../config/firebase";
+import SignIn from "./SignIn";
 
 const TODO_LIST = JSON.parse(
   localStorage.getItem("todo_list") ?? JSON.stringify([])
@@ -105,9 +117,52 @@ export default function MainBoard() {
 
   const boardSlideTiming = 300;
 
+  const [user, setUser] = useState<import("firebase/auth").User | null>(null);
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithPopup(auth, provider).then((result) => {
+        const user = result.user;
+        console.log(user);
+        setUser(user);
+        // Optional: Access Google Access Token with result.credential.accessToken
+      });
+      console.log("Signed in successfully with Google");
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user); // ✅ update state here
+        console.log("User is signed in:", user);
+      } else {
+        setUser(null); // optional, but clean
+        console.log("No user is signed in.");
+      }
+    });
+
+    return () => unsubscribe(); // clean up listener on unmount
+  }, []);
+
+  const handleGoogleSignOut = async () => {
+    try {
+      await signOut(auth);
+      console.log("User signed out successfully");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <>
-      <Box className="flex flex-col h-screen justify-between pt-5">
+      <Box className="flex flex-col h-screen justify-between pt-1 md:pt-5">
+        <SignIn
+          user={user}
+          handleGoogleSignIn={handleGoogleSignIn}
+          handleGoogleSignOut={handleGoogleSignOut}
+        ></SignIn>
         <Box sx={{ position: "relative", height: "100%" }}>
           <Slide
             direction="left"
@@ -154,7 +209,6 @@ export default function MainBoard() {
             </div>
           </Slide>
         </Box>
-
         <Box className="sticky bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100">
           <Button
             variant={activeBoard === "todo" ? "contained" : "outlined"}

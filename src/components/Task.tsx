@@ -50,7 +50,7 @@ export default function Task({
   };
 
   return (
-    <Box ref={containerRef}>
+    <Box className="h-12" ref={containerRef}>
       <Slide
         in={switchVisibility}
         mountOnEnter
@@ -96,7 +96,7 @@ function TaskInput(
       ></TextField>
       <ContentCopyIcon
         // className="absolute right-2 top-1/2 transform -translate-y-1/2"
-        className="h-7 w-7 relative bottom-1.5 right-7 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
+        className="h-6.5 w-6.5 relative bottom-1.5 right-7 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
         onClick={() => {
           navigator.clipboard.writeText(taskValue);
         }}
@@ -110,7 +110,7 @@ function TaskSwitch(
 ) {
   return (
     <Button
-      className="ml-3 mr-1 rounded-full h-10 w-10 min-w-0"
+      className="ml-3 mr-1 rounded-full h-8 w-8 min-w-0"
       variant="contained"
       onClick={handleSwitch}
     >
@@ -121,7 +121,7 @@ function TaskSwitch(
 function TaskDelete(handleDelete: () => void) {
   return (
     <Button
-      className=" rounded-full h-10 w-10 min-w-0"
+      className=" rounded-full h-8 w-8 min-w-0"
       variant="contained"
       onClick={handleDelete}
     >
