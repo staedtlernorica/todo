@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
 // import { loginWithGoogle } from "../auth/googleSignIn";
+import { isMobile } from "react-device-detect";
 import {
   auth,
   provider,
@@ -12,6 +13,8 @@ import {
   signOut,
   db,
   onAuthStateChanged,
+  signInWithRedirect,
+  getRedirectResult,
   // setPersistence,
   // browserLocalPersistence,
 } from "../config/firebase";
@@ -165,7 +168,7 @@ export default function MainBoard() {
         ></SignIn>
         <Box sx={{ position: "relative", height: "100%" }}>
           <Slide
-            direction="left"
+            direction="right"
             in={activeBoard === "todo"}
             timeout={boardSlideTiming}
             mountOnEnter
@@ -187,7 +190,7 @@ export default function MainBoard() {
             </div>
           </Slide>
           <Slide
-            direction="right"
+            direction="left"
             in={activeBoard === "done"}
             timeout={boardSlideTiming}
             mountOnEnter

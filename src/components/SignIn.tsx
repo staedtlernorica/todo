@@ -1,7 +1,8 @@
 import React from "react";
 import { Button, Box, Menu, MenuItem } from "@mui/material";
-import type { User } from "firebase/auth";
 import type { SignInProps } from "../types";
+import LogoutIcon from "@mui/icons-material/Logout";
+import LoginIcon from "@mui/icons-material/Login";
 
 export default function SignIn({
   user,
@@ -33,6 +34,9 @@ export default function SignIn({
           </Button>
 
           <Menu
+            // style the border of the menu
+            // menu should have 2px gap from avatar
+            // hovering over logout button should change bg to grey
             id="basic-menu"
             anchorEl={anchorEl}
             open={open}
@@ -45,7 +49,9 @@ export default function SignIn({
           >
             {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
             <MenuItem onClick={handleClose}>My account</MenuItem> */}
-            <MenuItem onClick={handleGoogleSignOut}>Logout</MenuItem>
+            <MenuItem onClick={handleGoogleSignOut}>
+              <Button startIcon={<LogoutIcon></LogoutIcon>}>Logout</Button>
+            </MenuItem>
           </Menu>
         </>
       ) : (
@@ -55,8 +61,9 @@ export default function SignIn({
             handleClose();
             handleGoogleSignIn();
           }}
+          startIcon={<LoginIcon />}
         >
-          Sign In
+          Login
         </Button>
       )}
     </Box>

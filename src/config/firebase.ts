@@ -7,6 +7,8 @@ import {
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence,
+  signInWithRedirect,
+  getRedirectResult,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -34,4 +36,6 @@ export {
   browserLocalPersistence,
   signOut,
   db,
+  signInWithRedirect,
+  getRedirectResult,
 };
