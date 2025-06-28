@@ -138,31 +138,6 @@ export default function MainBoard() {
       console.error("Error signing in with Google", error);
     }
   };
-  // const handleGoogleSignIn = async () => {
-  //   try {
-  //     if (isMobile || isTablet) {
-  //       await signInWithRedirect(auth, provider);
-  //     } else {
-  //       await signInWithPopup(auth, provider); // fallback for desktop
-  //     }
-  //   } catch (error) {
-  //     console.error("Sign-in error:", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       setUser(user); // ✅ update state here
-  //       console.log("User is signed in:", user);
-  //     } else {
-  //       setUser(null); // optional, but clean
-  //       console.log("No user is signed in.");
-  //     }
-  //   });
-
-  //   return () => unsubscribe(); // clean up listener on unmount
-  // }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
