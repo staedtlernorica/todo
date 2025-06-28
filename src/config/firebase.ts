@@ -38,4 +38,5 @@ export {
   db,
   signInWithRedirect,
   getRedirectResult,
+  GoogleAuthProvider,
 };

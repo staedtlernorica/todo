@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
 // import { loginWithGoogle } from "../auth/googleSignIn";
-import { isMobile } from "react-device-detect";
+import { isMobile, isTablet } from "react-device-detect";
 import {
   auth,
   provider,
@@ -15,6 +15,7 @@ import {
   onAuthStateChanged,
   signInWithRedirect,
   getRedirectResult,
+  GoogleAuthProvider,
   // setPersistence,
   // browserLocalPersistence,
 } from "../config/firebase";
@@ -121,6 +122,9 @@ export default function MainBoard() {
   const boardSlideTiming = 300;
 
   const [user, setUser] = useState<import("firebase/auth").User | null>(null);
+
+  // signInWithRedirect(auth, provider);
+
   const handleGoogleSignIn = async () => {
     try {
       await signInWithPopup(auth, provider).then((result) => {
@@ -134,19 +138,39 @@ export default function MainBoard() {
       console.error("Error signing in with Google", error);
     }
   };
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     if (isMobile || isTablet) {
+  //       await signInWithRedirect(auth, provider);
+  //     } else {
+  //       await signInWithPopup(auth, provider); // fallback for desktop
+  //     }
+  //   } catch (error) {
+  //     console.error("Sign-in error:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       setUser(user); // ✅ update state here
+  //       console.log("User is signed in:", user);
+  //     } else {
+  //       setUser(null); // optional, but clean
+  //       console.log("No user is signed in.");
+  //     }
+  //   });
+
+  //   return () => unsubscribe(); // clean up listener on unmount
+  // }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user); // ✅ update state here
-        console.log("User is signed in:", user);
-      } else {
-        setUser(null); // optional, but clean
-        console.log("No user is signed in.");
-      }
+      setUser(user ?? null);
+      console.log("Auth state changed:", user);
     });
 
-    return () => unsubscribe(); // clean up listener on unmount
+    return () => unsubscribe();
   }, []);
 
   const handleGoogleSignOut = async () => {
@@ -157,6 +181,23 @@ export default function MainBoard() {
       console.error("Error signing out:", error);
     }
   };
+
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result && result.user) {
+          setUser(result.user);
+
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential?.accessToken;
+
+          console.log("Redirect Sign-in Successful", result.user, token);
+        }
+      })
+      .catch((error) => {
+        console.error("Redirect result error:", error);
+      });
+  }, []);
 
   return (
     <>
