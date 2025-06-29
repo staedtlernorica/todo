@@ -19,6 +19,7 @@ export default function SignIn({
   const handleClose = () => {
     setAnchorEl(null);
   };
+  console.log(user);
 
   return (
     <Box className="self-end flex gap-1 mr-1 md:mr-5 md:gap-5">

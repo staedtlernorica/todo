@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
 // import { loginWithGoogle } from "../auth/googleSignIn";
-import { isMobile, isTablet } from "react-device-detect";
 import {
   auth,
   provider,
@@ -127,18 +126,14 @@ export default function MainBoard() {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithPopup(auth, provider).then((result) => {
-        const user = result.user;
-        console.log(user);
-        setUser(user);
-        // Optional: Access Google Access Token with result.credential.accessToken
-      });
+      await signInWithPopup(auth, provider);
       console.log("Signed in successfully with Google");
     } catch (error) {
       console.error("Error signing in with Google", error);
     }
   };
 
+  // checking authentication state between page reloads
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ?? null);
