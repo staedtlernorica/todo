@@ -31,6 +31,11 @@ const META = JSON.parse(
   localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
 );
 
+// =====================================================
+const FIREBASE_DATA = [];
+import { collection, addDoc } from "firebase/firestore";
+// =====================================================
+
 export default function MainBoard() {
   const [todoTasks, setTodoTasks] = useState(TODO_LIST);
   const [doneTasks, setDoneTasks] = useState(DONE_LIST);
@@ -223,7 +228,10 @@ export default function MainBoard() {
             </div>
           </Slide>
         </Box>
-        <Box className="sticky bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100">
+        <Box
+          // className="fixed relative bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100"
+          className="fixed bottom-0 left-0 w-full bg-gray-200 p-4 text-center shadow gap-2 flex justify-center"
+        >
           <Button
             variant={activeBoard === "todo" ? "contained" : "outlined"}
             onClick={() => setActiveBoard("todo")}
