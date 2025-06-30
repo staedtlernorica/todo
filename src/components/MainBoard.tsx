@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
 // import { loginWithGoogle } from "../auth/googleSignIn";
+import SignIn from "./SignIn";
 import {
   auth,
   provider,
@@ -12,43 +13,73 @@ import {
   signOut,
   db,
   onAuthStateChanged,
-  signInWithRedirect,
+  // signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
   // setPersistence,
   // browserLocalPersistence,
 } from "../config/firebase";
-import SignIn from "./SignIn";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  updateDoc,
+  setDoc,
+  getDocs,
+} from "firebase/firestore";
 
-const TODO_LIST = JSON.parse(
-  localStorage.getItem("todo_list") ?? JSON.stringify([])
-);
-const DONE_LIST = JSON.parse(
-  localStorage.getItem("done_list") ?? JSON.stringify([])
-);
+// get data from localStorage
+// const TODO_LIST = JSON.parse(
+//   localStorage.getItem("todo_list") ?? JSON.stringify([])
+// );
+// const DONE_LIST = JSON.parse(
+//   localStorage.getItem("done_list") ?? JSON.stringify([])
+// );
 
 const META = JSON.parse(
   localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
 );
 
-// =====================================================
-const FIREBASE_DATA = [];
-import { collection, addDoc } from "firebase/firestore";
-// =====================================================
-
 export default function MainBoard() {
-  const [todoTasks, setTodoTasks] = useState(TODO_LIST);
-  const [doneTasks, setDoneTasks] = useState(DONE_LIST);
+  const [user, setUser] = useState<import("firebase/auth").User | null>(null);
+  const [todoTasks, setTodoTasks] = useState([] as Task[]);
+  const [doneTasks, setDoneTasks] = useState([] as Task[]);
   const [activeBoard, setActiveBoard] = useState(
     META.lastActiveBoard || "todo"
   );
 
-  const addTask = (task: string, boardType: boardType, taskId?: string) => {
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchTasks = async () => {
+      const todoSnapshot = await getDocs(
+        collection(db, "users", user.uid, "todo")
+      );
+      const doneSnapshot = await getDocs(
+        collection(db, "users", user.uid, "done")
+      );
+
+      setTodoTasks(todoSnapshot.docs.map((doc) => doc.data() as Task));
+      setDoneTasks(doneSnapshot.docs.map((doc) => doc.data() as Task));
+    };
+
+    fetchTasks();
+  }, [user]);
+
+  const addTask = async (
+    task: string,
+    boardType: boardType,
+    taskId?: string
+  ) => {
+    if (!user) return;
+
     const newTask = {
       task: task,
       status: boardType,
       id: taskId || uuidv4(),
     };
+
+    // Update local state
     if (boardType === "todo") {
       setTodoTasks([...todoTasks, newTask]);
       localStorage.setItem(
@@ -62,6 +93,10 @@ export default function MainBoard() {
         JSON.stringify([...doneTasks, newTask])
       );
     }
+
+    // Write to Firestore
+    const taskRef = doc(db, "users", user.uid, boardType, newTask.id);
+    await setDoc(taskRef, newTask);
   };
 
   const updateTaskValue = (
@@ -76,58 +111,60 @@ export default function MainBoard() {
     }
   };
 
-  const setTaskValue = (
+  const setTaskValue = async (
     taskSetter: React.Dispatch<React.SetStateAction<Task[]>>,
     tasks: Task[],
     taskId: string,
     newValue: string,
     storageKey: string
   ) => {
-    const newList = tasks.map((task: Task) => {
+    if (!user) return;
+
+    const newList = tasks.map((task) => {
       if (task.id === taskId) {
         return { ...task, task: newValue };
       }
       return task;
     });
+
     taskSetter(newList);
     localStorage.setItem(storageKey, JSON.stringify(newList));
+
+    // Update Firestore
+    const boardType = storageKey === "todo_list" ? "todo" : "done";
+    const taskRef = doc(db, "users", user.uid, boardType, taskId);
+    await updateDoc(taskRef, { task: newValue });
   };
 
-  const updateTaskStatus = (
+  const updateTaskStatus = async (
     task: string,
     taskId: string,
     newBoardType: boardType
   ) => {
-    if (newBoardType === "todo") {
-      addTask(task, newBoardType, taskId);
-      deleteTask(taskId, "done");
-    } else {
-      addTask(task, newBoardType, taskId);
-      deleteTask(taskId, "todo");
-    }
+    await addTask(task, newBoardType, taskId);
+    await deleteTask(taskId, newBoardType === "todo" ? "done" : "todo");
   };
 
-  const deleteTask = (taskId: string, boardType: boardType) => {
+  const deleteTask = async (taskId: string, boardType: boardType) => {
+    if (!user) return;
+
+    // Update local state
     if (boardType === "todo") {
-      const updatedTasks: Task[] = todoTasks.filter(
-        (task: Task) => task.id !== taskId
-      );
+      const updatedTasks = todoTasks.filter((task) => task.id !== taskId);
       setTodoTasks(updatedTasks);
       localStorage.setItem("todo_list", JSON.stringify(updatedTasks));
     } else {
-      const updatedTasks: Task[] = doneTasks.filter(
-        (task: Task) => task.id !== taskId
-      );
+      const updatedTasks = doneTasks.filter((task) => task.id !== taskId);
       setDoneTasks(updatedTasks);
       localStorage.setItem("done_list", JSON.stringify(updatedTasks));
     }
+
+    // Delete from Firestore
+    const taskRef = doc(db, "users", user.uid, boardType, taskId);
+    await deleteDoc(taskRef);
   };
 
   const boardSlideTiming = 300;
-
-  const [user, setUser] = useState<import("firebase/auth").User | null>(null);
-
-  // signInWithRedirect(auth, provider);
 
   const handleGoogleSignIn = async () => {
     try {
