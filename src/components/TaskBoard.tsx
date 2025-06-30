@@ -26,8 +26,8 @@ export default function TaskBoard({
             updateTaskStatus={updateTaskStatus}
           />
         ))}
-        <NewTask addTask={addTask} boardType={boardType}></NewTask>
       </Box>
+      <NewTask addTask={addTask} boardType={boardType}></NewTask>
     </>
   );
 }

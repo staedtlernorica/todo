@@ -1,3 +1,5 @@
+import type { User } from "firebase/auth";
+
 export interface NewTaskProps {
   addTask: (task: string, boardType: boardType) => void;
   boardType: boardType;
@@ -51,3 +53,9 @@ export type Task = {
 };
 
 export type BoardSlideDirection = "left | right";
+
+export interface SignInProps {
+  user: User | null;
+  handleGoogleSignIn: () => Promise<void>;
+  handleGoogleSignOut: () => Promise<void>;
+}
