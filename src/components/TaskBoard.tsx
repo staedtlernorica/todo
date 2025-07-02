@@ -2,7 +2,7 @@ import Task from "./Task";
 // import NewTask from "./NewTask";
 import { Box } from "@mui/material";
 import type { TaskBoardProps } from "../types";
-import { use, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export default function TaskBoard({
   tasks,
