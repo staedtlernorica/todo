@@ -16,7 +16,7 @@ TaskBoardProps) {
   "[-webkit-mask-image:linear-gradient(180deg,#000_60%,transparent)]";
 
   // const [tasks, setTasks] = useState([] as Task[]);
-  const endRef = useRef(null);
+  const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
