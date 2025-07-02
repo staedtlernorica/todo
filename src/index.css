@@ -1,8 +1,1 @@
 @import "tailwindcss";
-
-/* prevent overscrolling on iOS Safari */
-html {
-  /* overflow: hidden; */
-  /* touch-action: none;
-  overflow-anchor: none; */
-}

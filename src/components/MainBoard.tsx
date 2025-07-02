@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
 import NewTask from "./NewTask";
-// import { loginWithGoogle } from "../auth/googleSignIn";
 import SignIn from "./SignIn";
 import {
   auth,
@@ -14,11 +13,8 @@ import {
   signOut,
   db,
   onAuthStateChanged,
-  // signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
-  // setPersistence,
-  // browserLocalPersistence,
 } from "../config/firebase";
 import {
   collection,
@@ -267,7 +263,7 @@ export default function MainBoard() {
               </div>
             </Slide>
           </Box>
-          <Box className="fixed bottom-0 w-full">
+          <Box className=" bottom-0 w-full">
             <NewTask addTask={addTask} boardType={activeBoard}></NewTask>
             <Box
               // className="fixed relative bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100"
@@ -287,9 +283,9 @@ export default function MainBoard() {
                 Done
               </Button>
               {/* <SignIn
-              user={user}
-              handleGoogleSignIn={handleGoogleSignIn}
-              handleGoogleSignOut={handleGoogleSignOut}
+                user={user}
+                handleGoogleSignIn={handleGoogleSignIn}
+                handleGoogleSignOut={handleGoogleSignOut}
               ></SignIn> */}
             </Box>
           </Box>
