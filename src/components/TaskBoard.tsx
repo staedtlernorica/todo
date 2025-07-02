@@ -1,19 +1,30 @@
 import Task from "./Task";
-import NewTask from "./NewTask";
+// import NewTask from "./NewTask";
 import { Box } from "@mui/material";
 import type { TaskBoardProps } from "../types";
+import { useEffect, useRef } from "react";
 
 export default function TaskBoard({
   tasks,
-  addTask,
+  // addTask,
   deleteTask,
   updateTaskValue,
   updateTaskStatus,
-  boardType,
-}: TaskBoardProps) {
+}: // boardType,
+TaskBoardProps) {
+  // const bottomFade =
+  "[-webkit-mask-image:linear-gradient(180deg,#000_60%,transparent)]";
+
+  // const [tasks, setTasks] = useState([] as Task[]);
+  const endRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [tasks]);
+
   return (
     <>
-      <Box className="flex flex-col">
+      <Box className="h-[450px] min-h-0 mt-6 overflow-y-auto flex flex-col px-2 pt-1 pb-1">
         {tasks.map((task, index) => (
           <Task
             index={index}
@@ -26,8 +37,9 @@ export default function TaskBoard({
             updateTaskStatus={updateTaskStatus}
           />
         ))}
+        <div ref={endRef} /> {/* Scroll target */}
       </Box>
-      <NewTask addTask={addTask} boardType={boardType}></NewTask>
+      {/* <NewTask addTask={addTask} boardType={boardType}></NewTask> */}
     </>
   );
 }

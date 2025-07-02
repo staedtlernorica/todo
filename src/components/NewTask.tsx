@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
+// import { useEffect } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import type { NewTaskProps, InputChangeEvent } from "../types";
 import AddTaskIcon from "@mui/icons-material/AddTask";
@@ -25,25 +26,25 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
     }
   };
 
-  useEffect(() => {
-    if (didJustAddTask.current) {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth",
-      });
-      didJustAddTask.current = false;
-    }
-  });
+  // useEffect(() => {
+  //   if (didJustAddTask.current) {
+  //     window.scrollTo({
+  //       top: document.body.scrollHeight,
+  //       behavior: "smooth",
+  //     });
+  //     didJustAddTask.current = false;
+  //   }
+  // }, []);
 
   return (
-    <Box className="flex justify-center items-center sticky bottom-17 bg-white mt-4">
+    <Box className="z-10 pt-3 w-full bg-gray-100 flex justify-center items-center">
       <TextField
+        className="p0 m0"
         variant="filled"
         placeholder="Add new task"
         value={newTask}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        style={{ margin: "10px 0" }}
       ></TextField>
 
       <Button
