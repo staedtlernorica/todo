@@ -221,7 +221,7 @@ export default function MainBoard() {
           handleGoogleSignOut={handleGoogleSignOut}
         ></SignIn>
         <Box className="flex flex-col h-screen justify-between pt-1 md:pt-5">
-          <Box className="relative h-full">
+          <Box className=" h-full">
             <Slide
               direction="right"
               in={activeBoard === "todo"}
@@ -267,31 +267,31 @@ export default function MainBoard() {
               </div>
             </Slide>
           </Box>
-          <Box>
+          <Box className="fixed bottom-0 w-full">
             <NewTask addTask={addTask} boardType={activeBoard}></NewTask>
-          </Box>
-          <Box
-            // className="fixed relative bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100"
-            // className="fixed bottom-0 left-0 w-full bg-gray-200 p-3.5 text-center shadow gap-2 flex justify-center"
-            className="z-10 w-full bg-gray-100 p-3.5 text-center shadow gap-2 sticky bottom-0 flex justify-center"
-          >
-            <Button
-              variant={activeBoard === "todo" ? "contained" : "outlined"}
-              onClick={() => setActiveBoard("todo")}
+            <Box
+              // className="fixed relative bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100"
+              // className="fixed bottom-0 left-0 w-full bg-gray-200 p-3.5 text-center shadow gap-2 flex justify-center"
+              className="z-10 w-full bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center"
             >
-              To Do
-            </Button>
-            <Button
-              variant={activeBoard === "done" ? "contained" : "outlined"}
-              onClick={() => setActiveBoard("done")}
-            >
-              Done
-            </Button>
-            {/* <SignIn
+              <Button
+                variant={activeBoard === "todo" ? "contained" : "outlined"}
+                onClick={() => setActiveBoard("todo")}
+              >
+                To Do
+              </Button>
+              <Button
+                variant={activeBoard === "done" ? "contained" : "outlined"}
+                onClick={() => setActiveBoard("done")}
+              >
+                Done
+              </Button>
+              {/* <SignIn
               user={user}
               handleGoogleSignIn={handleGoogleSignIn}
               handleGoogleSignOut={handleGoogleSignOut}
-            ></SignIn> */}
+              ></SignIn> */}
+            </Box>
           </Box>
         </Box>
       </Box>

@@ -18,7 +18,7 @@ TaskBoardProps) {
     <>
       <Box
         className="h-[450px] min-h-0 mt-6 overflow-y-auto flex flex-col px-2 pt-1 pb-1"
-        sx={{ WebkitOverflowScrolling: "touch" }}
+        // sx={{ WebkitOverflowScrolling: "touch" }}
       >
         {tasks.map((task, index) => (
           <Task
