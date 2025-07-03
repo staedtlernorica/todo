@@ -217,7 +217,7 @@ export default function MainBoard() {
           handleGoogleSignOut={handleGoogleSignOut}
         ></SignIn>
         <Box className="flex flex-col justify-between h-screen">
-          <Box className="pt-4 pb-35">
+          <Box className="">
             <Slide
               direction="right"
               in={activeBoard === "todo"}
@@ -229,7 +229,7 @@ export default function MainBoard() {
               //   exit: "linear",
               // }}
             >
-              <Box className="absolute w-full">
+              <Box className="absolute w-full pt-4 pb-45">
                 <TaskBoard
                   tasks={todoTasks}
                   boardType="todo"
@@ -251,7 +251,7 @@ export default function MainBoard() {
               //   exit: "linear",
               // }}
             >
-              <Box className="absolute w-full">
+              <Box className="absolute w-full pt-4 pb-45">
                 <TaskBoard
                   tasks={doneTasks}
                   boardType="done"
@@ -265,11 +265,7 @@ export default function MainBoard() {
           </Box>
           <Box className="fixed mt-5 bottom-8 w-full mt-5 h-[100px]">
             <NewTask addTask={addTask} boardType={activeBoard}></NewTask>
-            <Box
-              // className="fixed relative bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100"
-              // className="fixed bottom-0 left-0 w-full bg-gray-200 p-3.5 text-center shadow gap-2 flex justify-center"
-              className="bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center"
-            >
+            <Box className="bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
               <Button
                 variant={activeBoard === "todo" ? "contained" : "outlined"}
                 onClick={() => setActiveBoard("todo")}
