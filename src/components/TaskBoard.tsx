@@ -1,30 +1,33 @@
 import Task from "./Task";
-// import NewTask from "./NewTask";
 import { Box } from "@mui/material";
 import type { TaskBoardProps } from "../types";
 import { useEffect, useRef } from "react";
 
 export default function TaskBoard({
   tasks,
-  // addTask,
   deleteTask,
   updateTaskValue,
   updateTaskStatus,
-}: // boardType,
-TaskBoardProps) {
-  // const bottomFade =
-  "[-webkit-mask-image:linear-gradient(180deg,#000_60%,transparent)]";
-
-  // const [tasks, setTasks] = useState([] as Task[]);
+}: TaskBoardProps) {
   const endRef = useRef<HTMLDivElement | null>(null);
+  const prevTaskCountRef = useRef<number>(tasks.length);
+
+  // const bottomFade =
+  // ("[-webkit-mask-image:linear-gradient(180deg,#000_60%,transparent)]");
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [tasks]);
+    if (tasks.length > prevTaskCountRef.current) {
+      // Only scroll if a task was added
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Update previous task count for next comparison
+    prevTaskCountRef.current = tasks.length;
+  }, [tasks.length]);
 
   return (
     <>
-      <Box className="h-[450px] min-h-0 mt-6 overflow-y-auto flex flex-col px-2 pt-1 pb-1">
+      <Box className=" mt-6 flex flex-col px-2 pt-1 pb-1">
         {tasks.map((task, index) => (
           <Task
             index={index}
@@ -39,7 +42,6 @@ TaskBoardProps) {
         ))}
         <div ref={endRef} /> {/* Scroll target */}
       </Box>
-      {/* <NewTask addTask={addTask} boardType={boardType}></NewTask> */}
     </>
   );
 }
