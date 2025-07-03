@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+.more-entries-fade-container::before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 60px;
+  bottom: 100px;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(254, 254, 254, 0.176),
+    rgb(255, 255, 255)
+  );
+}
