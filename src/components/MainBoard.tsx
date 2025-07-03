@@ -229,7 +229,7 @@ export default function MainBoard() {
               //   exit: "linear",
               // }}
             >
-              <Box className="w-full">
+              <Box className="absolute w-full">
                 <TaskBoard
                   tasks={todoTasks}
                   boardType="todo"
@@ -251,7 +251,7 @@ export default function MainBoard() {
               //   exit: "linear",
               // }}
             >
-              <Box className="w-full">
+              <Box className="absolute w-full">
                 <TaskBoard
                   tasks={doneTasks}
                   boardType="done"
