@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TaskBoard from "./TaskBoard";
 import { Box, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
@@ -25,14 +25,6 @@ import {
   getDocs,
 } from "firebase/firestore";
 
-// get data from localStorage
-// const TODO_LIST = JSON.parse(
-//   localStorage.getItem("todo_list") ?? JSON.stringify([])
-// );
-// const DONE_LIST = JSON.parse(
-//   localStorage.getItem("done_list") ?? JSON.stringify([])
-// );
-
 const META = JSON.parse(
   localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
 );
@@ -44,6 +36,8 @@ export default function MainBoard() {
   const [activeBoard, setActiveBoard] = useState(
     META.lastActiveBoard || "todo"
   );
+
+  const fadeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -76,7 +70,6 @@ export default function MainBoard() {
       id: taskId || uuidv4(),
     };
 
-    // Update local state
     if (boardType === "todo") {
       setTodoTasks([...todoTasks, newTask]);
       localStorage.setItem(
@@ -91,7 +84,6 @@ export default function MainBoard() {
       );
     }
 
-    // Write to Firestore
     const taskRef = doc(db, "users", user.uid, boardType, newTask.id);
     await setDoc(taskRef, newTask);
   };
@@ -127,7 +119,6 @@ export default function MainBoard() {
     taskSetter(newList);
     localStorage.setItem(storageKey, JSON.stringify(newList));
 
-    // Update Firestore
     const boardType = storageKey === "todo_list" ? "todo" : "done";
     const taskRef = doc(db, "users", user.uid, boardType, taskId);
     await updateDoc(taskRef, { task: newValue });
@@ -145,7 +136,6 @@ export default function MainBoard() {
   const deleteTask = async (taskId: string, boardType: boardType) => {
     if (!user) return;
 
-    // Update local state
     if (boardType === "todo") {
       const updatedTasks = todoTasks.filter((task) => task.id !== taskId);
       setTodoTasks(updatedTasks);
@@ -156,7 +146,6 @@ export default function MainBoard() {
       localStorage.setItem("done_list", JSON.stringify(updatedTasks));
     }
 
-    // Delete from Firestore
     const taskRef = doc(db, "users", user.uid, boardType, taskId);
     await deleteDoc(taskRef);
   };
@@ -172,7 +161,6 @@ export default function MainBoard() {
     }
   };
 
-  // checking authentication state between page reloads
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ?? null);
@@ -208,26 +196,51 @@ export default function MainBoard() {
       });
   }, []);
 
+  // Intersection Observer effect to remove/add fade container class
+  useEffect(() => {
+    const sentinel = document.getElementById("scroll-sentinel");
+    const fadeContainer = fadeRef.current;
+
+    if (!sentinel || !fadeContainer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            fadeContainer.classList.remove("more-entries-fade-container");
+          } else {
+            fadeContainer.classList.add("more-entries-fade-container");
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "0px 0px -20px 0px",
+        threshold: 1,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
-      <Box className="">
+      <Box>
         <SignIn
           user={user}
           handleGoogleSignIn={handleGoogleSignIn}
           handleGoogleSignOut={handleGoogleSignOut}
-        ></SignIn>
-        <Box className="flex flex-col justify-between h-screen">
-          <Box className="">
+        />
+        <Box className="flex flex-col justify-between h-screen relative">
+          <Box>
             <Slide
               direction="right"
               in={activeBoard === "todo"}
               timeout={boardSlideTiming}
               mountOnEnter
               unmountOnExit
-              // easing={{
-              //   enter: "cubic-bezier(0, 1.5, .8, 1)",
-              //   exit: "linear",
-              // }}
             >
               <Box className="absolute w-full pt-5 pb-35">
                 <TaskBoard
@@ -246,10 +259,6 @@ export default function MainBoard() {
               timeout={boardSlideTiming}
               mountOnEnter
               unmountOnExit
-              // easing={{
-              //   enter: "cubic-bezier(0, 1.5, .8, 1)",
-              //   exit: "linear",
-              // }}
             >
               <Box className="absolute w-full pt-5 pb-35">
                 <TaskBoard
@@ -263,8 +272,12 @@ export default function MainBoard() {
               </Box>
             </Slide>
           </Box>
-          <Box className="fixed mt-5 bottom-8 w-full mt-5 h-[100px]">
-            <NewTask addTask={addTask} boardType={activeBoard}></NewTask>
+
+          <Box
+            ref={fadeRef}
+            className="bg-gray-100 more-entries-fade-container fixed mt-5 bottom-8 w-full h-[100px]"
+          >
+            <NewTask addTask={addTask} boardType={activeBoard} />
             <Box className="bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
               <Button
                 variant={activeBoard === "todo" ? "contained" : "outlined"}
@@ -280,6 +293,9 @@ export default function MainBoard() {
               </Button>
             </Box>
           </Box>
+
+          {/* Sentinel div for intersection observer */}
+          <Box id="scroll-sentinel" className="h-[1px] w-full" />
         </Box>
       </Box>
     </>
