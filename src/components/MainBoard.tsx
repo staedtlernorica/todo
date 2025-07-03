@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
 import NewTask from "./NewTask";
-// import SignIn from "./SignIn";
+import SignIn from "./SignIn";
 import {
   auth,
   provider,
@@ -211,13 +211,13 @@ export default function MainBoard() {
   return (
     <>
       <Box className="">
-        {/* <SignIn
+        <SignIn
           user={user}
           handleGoogleSignIn={handleGoogleSignIn}
           handleGoogleSignOut={handleGoogleSignOut}
-        ></SignIn> */}
+        ></SignIn>
         <Box className="flex flex-col justify-between h-screen">
-          <Box className="pb-35">
+          <Box className="pt-4 pb-35">
             <Slide
               direction="right"
               in={activeBoard === "todo"}
