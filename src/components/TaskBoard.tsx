@@ -27,7 +27,7 @@ export default function TaskBoard({
 
   return (
     <>
-      <Box className="h-[450px] min-h-0 mt-6 overflow-y-auto flex flex-col px-2 pt-1 pb-1">
+      <Box className=" mt-6 flex flex-col px-2 pt-1 pb-1">
         {tasks.map((task, index) => (
           <Task
             index={index}

@@ -67,7 +67,7 @@ export default function Task({
           timeout={delTransitionTiming}
           onExited={() => deleteTask(taskId, taskStatus)}
         >
-          <Box className="flex items-center justify-center m-4">
+          <Box className="flex items-center justify-center m-3 mt-0">
             <Typography className="mr-5 font-bold h-6 w-6 text-center rounded-full">
               {index + 1}.
             </Typography>

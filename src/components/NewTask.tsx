@@ -37,7 +37,7 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
   // }, []);
 
   return (
-    <Box className="z-10 pt-3 w-full bg-gray-100 flex justify-center items-center">
+    <Box className="pt-3 w-full bg-gray-100 flex justify-center items-center">
       <TextField
         className="p0 m0"
         variant="filled"
