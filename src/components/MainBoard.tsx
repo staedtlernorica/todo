@@ -49,21 +49,28 @@ export default function MainBoard() {
   );
 
   useEffect(() => {
-    if (!user) return;
-
-    const fetchTasks = async () => {
-      const todoSnapshot = await getDocs(
-        collection(db, "users", user.uid, "todo")
+    if (user) {
+      const fetchTasks = async () => {
+        const todoSnapshot = await getDocs(
+          collection(db, "users", user.uid, "todo")
+        );
+        const doneSnapshot = await getDocs(
+          collection(db, "users", user.uid, "done")
+        );
+        setTodoTasks(todoSnapshot.docs.map((doc) => doc.data() as Task));
+        setDoneTasks(doneSnapshot.docs.map((doc) => doc.data() as Task));
+      };
+      fetchTasks();
+    } else if (!user) {
+      const TODO_LIST = JSON.parse(
+        localStorage.getItem("todo_list") ?? JSON.stringify([])
       );
-      const doneSnapshot = await getDocs(
-        collection(db, "users", user.uid, "done")
+      const DONE_LIST = JSON.parse(
+        localStorage.getItem("done_list") ?? JSON.stringify([])
       );
-
-      setTodoTasks(todoSnapshot.docs.map((doc) => doc.data() as Task));
-      setDoneTasks(doneSnapshot.docs.map((doc) => doc.data() as Task));
-    };
-
-    fetchTasks();
+      setTodoTasks(TODO_LIST);
+      setDoneTasks(DONE_LIST);
+    }
   }, [user]);
 
   const addTask = async (
@@ -71,8 +78,6 @@ export default function MainBoard() {
     boardType: boardType,
     taskId?: string
   ) => {
-    if (!user) return;
-
     const newTask = {
       task: task,
       status: boardType,
@@ -81,22 +86,20 @@ export default function MainBoard() {
 
     // Update local state
     if (boardType === "todo") {
-      setTodoTasks([...todoTasks, newTask]);
-      localStorage.setItem(
-        "todo_list",
-        JSON.stringify([...todoTasks, newTask])
-      );
+      const updated = [...todoTasks, newTask];
+      setTodoTasks(updated);
+      localStorage.setItem("todo_list", JSON.stringify(updated));
     } else {
-      setDoneTasks([...doneTasks, newTask]);
-      localStorage.setItem(
-        "done_list",
-        JSON.stringify([...doneTasks, newTask])
-      );
+      const updated = [...doneTasks, newTask];
+      setDoneTasks(updated);
+      localStorage.setItem("done_list", JSON.stringify(updated));
     }
 
-    // Write to Firestore
-    const taskRef = doc(db, "users", user.uid, boardType, newTask.id);
-    await setDoc(taskRef, newTask);
+    // Only sync with Firestore if logged in
+    if (user) {
+      const taskRef = doc(db, "users", user.uid, boardType, newTask.id);
+      await setDoc(taskRef, newTask);
+    }
   };
 
   const updateTaskValue = (
@@ -118,22 +121,21 @@ export default function MainBoard() {
     newValue: string,
     storageKey: string
   ) => {
-    if (!user) return;
-
     const newList = tasks.map((task) => {
       if (task.id === taskId) {
         return { ...task, task: newValue };
       }
       return task;
     });
-
     taskSetter(newList);
     localStorage.setItem(storageKey, JSON.stringify(newList));
 
     // Update Firestore
-    const boardType = storageKey === "todo_list" ? "todo" : "done";
-    const taskRef = doc(db, "users", user.uid, boardType, taskId);
-    await updateDoc(taskRef, { task: newValue });
+    if (user) {
+      const boardType = storageKey === "todo_list" ? "todo" : "done";
+      const taskRef = doc(db, "users", user.uid, boardType, taskId);
+      await updateDoc(taskRef, { task: newValue });
+    }
   };
 
   const updateTaskStatus = async (
@@ -146,8 +148,6 @@ export default function MainBoard() {
   };
 
   const deleteTask = async (taskId: string, boardType: boardType) => {
-    if (!user) return;
-
     // Update local state
     if (boardType === "todo") {
       const updatedTasks = todoTasks.filter((task) => task.id !== taskId);
@@ -159,9 +159,11 @@ export default function MainBoard() {
       localStorage.setItem("done_list", JSON.stringify(updatedTasks));
     }
 
-    // Delete from Firestore
-    const taskRef = doc(db, "users", user.uid, boardType, taskId);
-    await deleteDoc(taskRef);
+    if (user) {
+      // Delete from Firestore
+      const taskRef = doc(db, "users", user.uid, boardType, taskId);
+      await deleteDoc(taskRef);
+    }
   };
 
   const boardSlideTiming = 300;
