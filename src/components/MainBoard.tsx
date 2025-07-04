@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TaskBoard from "./TaskBoard";
 import { Box, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
-// import { loginWithGoogle } from "../auth/googleSignIn";
+import NewTask from "./NewTask";
 import SignIn from "./SignIn";
 import {
   auth,
@@ -13,11 +13,8 @@ import {
   signOut,
   db,
   onAuthStateChanged,
-  // signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
-  // setPersistence,
-  // browserLocalPersistence,
 } from "../config/firebase";
 import {
   collection,
@@ -27,14 +24,6 @@ import {
   setDoc,
   getDocs,
 } from "firebase/firestore";
-
-// get data from localStorage
-// const TODO_LIST = JSON.parse(
-//   localStorage.getItem("todo_list") ?? JSON.stringify([])
-// );
-// const DONE_LIST = JSON.parse(
-//   localStorage.getItem("done_list") ?? JSON.stringify([])
-// );
 
 const META = JSON.parse(
   localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
@@ -47,6 +36,8 @@ export default function MainBoard() {
   const [activeBoard, setActiveBoard] = useState(
     META.lastActiveBoard || "todo"
   );
+
+  const fadeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -84,7 +75,6 @@ export default function MainBoard() {
       id: taskId || uuidv4(),
     };
 
-    // Update local state
     if (boardType === "todo") {
       const updated = [...todoTasks, newTask];
       setTodoTasks(updated);
@@ -177,7 +167,6 @@ export default function MainBoard() {
     }
   };
 
-  // checking authentication state between page reloads
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ?? null);
@@ -213,76 +202,106 @@ export default function MainBoard() {
       });
   }, []);
 
+  // Intersection Observer effect to remove/add fade container class
+  useEffect(() => {
+    const sentinel = document.getElementById("scroll-sentinel");
+    const fadeContainer = fadeRef.current;
+
+    if (!sentinel || !fadeContainer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            fadeContainer.classList.remove("more-entries-fade-container");
+          } else {
+            fadeContainer.classList.add("more-entries-fade-container");
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "0px 0px -20px 0px",
+        threshold: 1,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
-      <Box className="flex flex-col h-screen justify-between pt-1 md:pt-5">
+      <Box>
         <SignIn
           user={user}
           handleGoogleSignIn={handleGoogleSignIn}
           handleGoogleSignOut={handleGoogleSignOut}
-        ></SignIn>
-        <Box sx={{ position: "relative", height: "100%" }}>
-          <Slide
-            direction="right"
-            in={activeBoard === "todo"}
-            timeout={boardSlideTiming}
-            mountOnEnter
-            unmountOnExit
-            // easing={{
-            //   enter: "cubic-bezier(0, 1.5, .8, 1)",
-            //   exit: "linear",
-            // }}
+        />
+        <Box className="flex flex-col justify-between h-screen relative">
+          <Box>
+            <Slide
+              direction="right"
+              in={activeBoard === "todo"}
+              timeout={boardSlideTiming}
+              mountOnEnter
+              unmountOnExit
+            >
+              <Box className="absolute w-full pt-5 pb-35">
+                <TaskBoard
+                  tasks={todoTasks}
+                  boardType="todo"
+                  deleteTask={deleteTask}
+                  updateTaskValue={updateTaskValue}
+                  updateTaskStatus={updateTaskStatus}
+                  addTask={addTask}
+                />
+              </Box>
+            </Slide>
+            <Slide
+              direction="left"
+              in={activeBoard === "done"}
+              timeout={boardSlideTiming}
+              mountOnEnter
+              unmountOnExit
+            >
+              <Box className="absolute w-full pt-5 pb-35">
+                <TaskBoard
+                  tasks={doneTasks}
+                  boardType="done"
+                  deleteTask={deleteTask}
+                  updateTaskValue={updateTaskValue}
+                  updateTaskStatus={updateTaskStatus}
+                  addTask={addTask}
+                />
+              </Box>
+            </Slide>
+          </Box>
+
+          <Box
+            ref={fadeRef}
+            className="bg-gray-100 more-entries-fade-container fixed mt-5 bottom-8 w-full h-[100px]"
           >
-            <div style={{ position: "absolute", width: "100%" }}>
-              <TaskBoard
-                tasks={todoTasks}
-                boardType="todo"
-                deleteTask={deleteTask}
-                updateTaskValue={updateTaskValue}
-                updateTaskStatus={updateTaskStatus}
-                addTask={addTask}
-              />
-            </div>
-          </Slide>
-          <Slide
-            direction="left"
-            in={activeBoard === "done"}
-            timeout={boardSlideTiming}
-            mountOnEnter
-            unmountOnExit
-            // easing={{
-            //   enter: "cubic-bezier(0, 1.5, .8, 1)",
-            //   exit: "linear",
-            // }}
-          >
-            <div style={{ position: "absolute", width: "100%" }}>
-              <TaskBoard
-                tasks={doneTasks}
-                boardType="done"
-                deleteTask={deleteTask}
-                updateTaskValue={updateTaskValue}
-                updateTaskStatus={updateTaskStatus}
-                addTask={addTask}
-              />
-            </div>
-          </Slide>
-        </Box>
-        <Box
-          // className="fixed relative bottom-0 flex justify-center items-center mt-0 gap-2 p-4 bg-gray-100"
-          className="fixed bottom-0 left-0 w-full bg-gray-200 p-4 text-center shadow gap-2 flex justify-center"
-        >
-          <Button
-            variant={activeBoard === "todo" ? "contained" : "outlined"}
-            onClick={() => setActiveBoard("todo")}
-          >
-            To Do
-          </Button>
-          <Button
-            variant={activeBoard === "done" ? "contained" : "outlined"}
-            onClick={() => setActiveBoard("done")}
-          >
-            Done
-          </Button>
+            <NewTask addTask={addTask} boardType={activeBoard} />
+            <Box className="bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
+              <Button
+                variant={activeBoard === "todo" ? "contained" : "outlined"}
+                onClick={() => setActiveBoard("todo")}
+              >
+                To Do
+              </Button>
+              <Button
+                variant={activeBoard === "done" ? "contained" : "outlined"}
+                onClick={() => setActiveBoard("done")}
+              >
+                Done
+              </Button>
+            </Box>
+          </Box>
+
+          {/* Sentinel div for intersection observer */}
+          <Box id="scroll-sentinel" className="h-[1px] w-full" />
         </Box>
       </Box>
     </>

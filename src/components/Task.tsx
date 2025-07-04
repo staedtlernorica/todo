@@ -67,7 +67,7 @@ export default function Task({
           timeout={delTransitionTiming}
           onExited={() => deleteTask(taskId, taskStatus)}
         >
-          <Box className="flex items-center justify-center m-4">
+          <Box className="flex items-center justify-center m-3 mt-0">
             <Typography className="mr-5 font-bold h-6 w-6 text-center rounded-full">
               {index + 1}.
             </Typography>
@@ -96,7 +96,7 @@ function TaskInput(
       ></TextField>
       <ContentCopyIcon
         // className="absolute right-2 top-1/2 transform -translate-y-1/2"
-        className="h-6.5 w-6.5 relative bottom-1.5 right-7 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
+        className="h-6.5 w-6.5 bottom-1.5 right-7 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
         onClick={() => {
           navigator.clipboard.writeText(taskValue);
         }}
