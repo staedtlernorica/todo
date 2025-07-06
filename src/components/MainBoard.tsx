@@ -26,10 +26,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 
-const META = JSON.parse(
-  localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
-);
-
+// get cookie for last active board
 function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -41,12 +38,7 @@ function getCookie(name: string) {
   }
   return null;
 }
-
 const LAST_ACTIVE_BOARD = getCookie("lastActiveBoard");
-
-// check cookie for activeBoard, if none set cookie to 'todo'
-// set activeBoard to cookie value
-// every time the board changes, write to cookie
 
 export default function MainBoard() {
   const [user, setUser] = useState<import("firebase/auth").User | null>(null);
