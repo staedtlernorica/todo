@@ -30,13 +30,40 @@ const META = JSON.parse(
   localStorage.getItem("meta") ?? JSON.stringify({ lastActiveBoard: "todo" })
 );
 
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    const part = parts.pop();
+    if (part !== undefined) {
+      return part.split(";").shift();
+    }
+  }
+  return null;
+}
+
+const LAST_ACTIVE_BOARD = getCookie("lastActiveBoard");
+
+// check cookie for activeBoard, if none set cookie to 'todo'
+// set activeBoard to cookie value
+// every time the board changes, write to cookie
+
 export default function MainBoard() {
   const [user, setUser] = useState<import("firebase/auth").User | null>(null);
   const [todoTasks, setTodoTasks] = useState([] as Task[]);
   const [doneTasks, setDoneTasks] = useState([] as Task[]);
-  const [activeBoard, setActiveBoard] = useState(
-    META.lastActiveBoard || "todo"
+  const [activeBoard, setActiveBoard] = useState<boardType>(
+    // META.lastActiveBoard || "todo"
+    (LAST_ACTIVE_BOARD as boardType) || "todo"
   );
+
+  function handleBoardChange(e: boardType): boardType {
+    setActiveBoard(e);
+    const date = new Date();
+    date.setTime(date.getTime() + 365 * 24 * 60 * 60 * 1000);
+    document.cookie = `lastActiveBoard=${e}; expires=${date.toUTCString()}; path=/`;
+    return e;
+  }
 
   const fadeRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,13 +99,13 @@ export default function MainBoard() {
     } else if (!user) {
       const TODO_LIST = JSON.parse(
         localStorage.getItem("todo_list") ?? JSON.stringify([])
-      ).map((t) => ({
+      ).map((t: { createdAt: string | number | Date }) => ({
         ...t,
         createdAt: new Date(t.createdAt),
       }));
       const DONE_LIST = JSON.parse(
         localStorage.getItem("done_list") ?? JSON.stringify([])
-      ).map((t) => ({
+      ).map((t: { createdAt: string | number | Date }) => ({
         ...t,
         createdAt: new Date(t.createdAt),
       }));
@@ -93,41 +120,48 @@ export default function MainBoard() {
     taskId?: string
   ) => {
     const now = new Date();
-    const newTask = {
-      task: task,
+    const newTask: Task = {
+      task,
       status: boardType,
       id: taskId || uuidv4(),
-      createdAt: now, // Use JS Date for local use
+      createdAt: now, // stays a Date in the app state
     };
 
+    // Update local state
     if (boardType === "todo") {
-      // const updated = [...todoTasks, newTask];
-      const updated = [
-        ...todoTasks,
-        {
-          ...newTask,
-          createdAt: now.toISOString(), // if Date doesn't serialize well in your flow
-        },
-      ];
+      const updated = [...todoTasks, newTask];
       setTodoTasks(updated);
-      localStorage.setItem("todo_list", JSON.stringify(updated));
+
+      // Save to localStorage with ISO string for serialization
+      const serialized = updated.map((task) => ({
+        ...task,
+        createdAt:
+          task.createdAt instanceof Date
+            ? task.createdAt.toISOString()
+            : task.createdAt.toDate().toISOString(), // Timestamp -> Date
+      }));
+      localStorage.setItem("todo_list", JSON.stringify(serialized));
     } else {
-      // const updated = [...doneTasks, newTask];
-      const updated = [
-        ...doneTasks,
-        {
-          ...newTask,
-          createdAt: now.toISOString(), // if Date doesn't serialize well in your flow
-        },
-      ];
+      const updated = [...doneTasks, newTask];
       setDoneTasks(updated);
-      localStorage.setItem("done_list", JSON.stringify(updated));
+
+      const serialized = updated.map((task) => ({
+        ...task,
+        createdAt:
+          task.createdAt instanceof Date
+            ? task.createdAt.toISOString()
+            : task.createdAt.toDate().toISOString(),
+      }));
+      localStorage.setItem("done_list", JSON.stringify(serialized));
     }
 
-    // Only sync with Firestore if logged in
+    // Save to Firestore with Firestore's Timestamp
     if (user) {
       const taskRef = doc(db, "users", user.uid, boardType, newTask.id);
-      await setDoc(taskRef, { ...newTask, createdAt: Timestamp.fromDate(now) });
+      await setDoc(taskRef, {
+        ...newTask,
+        createdAt: Timestamp.fromDate(now),
+      });
     }
   };
 
@@ -326,13 +360,13 @@ export default function MainBoard() {
             <Box className="bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
               <Button
                 variant={activeBoard === "todo" ? "contained" : "outlined"}
-                onClick={() => setActiveBoard("todo")}
+                onClick={() => handleBoardChange("todo")}
               >
                 To Do
               </Button>
               <Button
                 variant={activeBoard === "done" ? "contained" : "outlined"}
-                onClick={() => setActiveBoard("done")}
+                onClick={() => handleBoardChange("done")}
               >
                 Done
               </Button>
