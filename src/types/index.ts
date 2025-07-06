@@ -1,4 +1,5 @@
 import type { User } from "firebase/auth";
+import type { Timestamp } from "firebase/firestore";
 
 export interface NewTaskProps {
   addTask: (task: string, boardType: boardType) => void;
@@ -47,9 +48,11 @@ export type TaskBoardProps = {
 };
 
 export type Task = {
-  task: string;
   id: string;
+  task: string;
   status: boardType;
+  createdAt: Date | Timestamp;
+  updatedAt?: Date | Timestamp;
 };
 
 export type BoardSlideDirection = "left | right";
