@@ -23,6 +23,7 @@ import {
   updateDoc,
   setDoc,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 
 const META = JSON.parse(
@@ -48,17 +49,39 @@ export default function MainBoard() {
         const doneSnapshot = await getDocs(
           collection(db, "users", user.uid, "done")
         );
-        setTodoTasks(todoSnapshot.docs.map((doc) => doc.data() as Task));
-        setDoneTasks(doneSnapshot.docs.map((doc) => doc.data() as Task));
+        setTodoTasks(
+          todoSnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              ...data,
+              createdAt: data.createdAt?.toDate?.() ?? new Date(), // fallback for missing timestamp
+            } as Task;
+          })
+        );
+        setDoneTasks(
+          doneSnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              ...data,
+              createdAt: data.createdAt?.toDate?.() ?? new Date(), // fallback for missing timestamp
+            } as Task;
+          })
+        );
       };
       fetchTasks();
     } else if (!user) {
       const TODO_LIST = JSON.parse(
         localStorage.getItem("todo_list") ?? JSON.stringify([])
-      );
+      ).map((t) => ({
+        ...t,
+        createdAt: new Date(t.createdAt),
+      }));
       const DONE_LIST = JSON.parse(
         localStorage.getItem("done_list") ?? JSON.stringify([])
-      );
+      ).map((t) => ({
+        ...t,
+        createdAt: new Date(t.createdAt),
+      }));
       setTodoTasks(TODO_LIST);
       setDoneTasks(DONE_LIST);
     }
@@ -69,18 +92,34 @@ export default function MainBoard() {
     boardType: boardType,
     taskId?: string
   ) => {
+    const now = new Date();
     const newTask = {
       task: task,
       status: boardType,
       id: taskId || uuidv4(),
+      createdAt: now, // Use JS Date for local use
     };
 
     if (boardType === "todo") {
-      const updated = [...todoTasks, newTask];
+      // const updated = [...todoTasks, newTask];
+      const updated = [
+        ...todoTasks,
+        {
+          ...newTask,
+          createdAt: now.toISOString(), // if Date doesn't serialize well in your flow
+        },
+      ];
       setTodoTasks(updated);
       localStorage.setItem("todo_list", JSON.stringify(updated));
     } else {
-      const updated = [...doneTasks, newTask];
+      // const updated = [...doneTasks, newTask];
+      const updated = [
+        ...doneTasks,
+        {
+          ...newTask,
+          createdAt: now.toISOString(), // if Date doesn't serialize well in your flow
+        },
+      ];
       setDoneTasks(updated);
       localStorage.setItem("done_list", JSON.stringify(updated));
     }
@@ -88,7 +127,7 @@ export default function MainBoard() {
     // Only sync with Firestore if logged in
     if (user) {
       const taskRef = doc(db, "users", user.uid, boardType, newTask.id);
-      await setDoc(taskRef, newTask);
+      await setDoc(taskRef, { ...newTask, createdAt: Timestamp.fromDate(now) });
     }
   };
 
