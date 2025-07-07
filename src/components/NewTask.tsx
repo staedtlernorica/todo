@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-// import { useEffect } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import type { NewTaskProps, InputChangeEvent } from "../types";
 import AddTaskIcon from "@mui/icons-material/AddTask";
@@ -25,16 +24,6 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
       didJustAddTask.current = true;
     }
   };
-
-  // useEffect(() => {
-  //   if (didJustAddTask.current) {
-  //     window.scrollTo({
-  //       top: document.body.scrollHeight,
-  //       behavior: "smooth",
-  //     });
-  //     didJustAddTask.current = false;
-  //   }
-  // }, []);
 
   return (
     <Box className="pt-3 w-full bg-gray-100 flex justify-center items-center">

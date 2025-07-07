@@ -1,29 +1,39 @@
 import Task from "./Task";
 import { Box } from "@mui/material";
 import type { TaskBoardProps } from "../types";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function TaskBoard({
   tasks,
   deleteTask,
   updateTaskValue,
   updateTaskStatus,
+  endRef,
 }: TaskBoardProps) {
-  const endRef = useRef<HTMLDivElement | null>(null);
-  const prevTaskCountRef = useRef<number>(tasks.length);
+  // const endRef = useRef<HTMLDivElement | null>(null);
+  // const prevTaskCountRef = useRef<number>(tasks.length);
+  // const mountCount = useRef(0);
 
-  // const bottomFade =
-  // ("[-webkit-mask-image:linear-gradient(180deg,#000_60%,transparent)]");
+  // const [canScroll, setCanScroll] = useState(false);
 
-  useEffect(() => {
-    if (tasks.length > prevTaskCountRef.current) {
-      // Only scroll if a task was added
-      endRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+  // // useEffect(() => {
+  // //   mountCount.current += 1;
+  // //   console.log(`internal ${mountCount.current} time(s)`);
+  // // }, [tasks.length]);
 
-    // Update previous task count for next comparison
-    prevTaskCountRef.current = tasks.length;
-  }, [tasks.length]);
+  // useEffect(() => {
+  //   if (tasks.length > prevTaskCountRef.current && canScroll) {
+  //     // Only scroll if a task was added
+  //     // endRef.current?.scrollIntoView({ behavior: "smooth" });
+  //   }
+
+  //   // Update previous task count for next comparison
+  //   prevTaskCountRef.current = tasks.length;
+  // }, [tasks.length]);
+
+  // useEffect(() => {
+  //   setCanScroll(true);
+  // }, []);
 
   return (
     <>
@@ -40,7 +50,8 @@ export default function TaskBoard({
             updateTaskStatus={updateTaskStatus}
           />
         ))}
-        <div ref={endRef} /> {/* Scroll target */}
+        <div ref={endRef} />
+        {/* Scroll target */}
       </Box>
     </>
   );
