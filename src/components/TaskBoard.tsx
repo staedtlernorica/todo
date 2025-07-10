@@ -1,39 +1,23 @@
 import Task from "./Task";
 import { Box } from "@mui/material";
 import type { TaskBoardProps } from "../types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function TaskBoard({
   tasks,
   deleteTask,
   updateTaskValue,
   updateTaskStatus,
-  endRef,
 }: TaskBoardProps) {
-  // const endRef = useRef<HTMLDivElement | null>(null);
-  // const prevTaskCountRef = useRef<number>(tasks.length);
-  // const mountCount = useRef(0);
+  const endRef = useRef<HTMLDivElement | null>(null);
+  const prevNumOfTasks = useRef(tasks.length);
 
-  // const [canScroll, setCanScroll] = useState(false);
-
-  // // useEffect(() => {
-  // //   mountCount.current += 1;
-  // //   console.log(`internal ${mountCount.current} time(s)`);
-  // // }, [tasks.length]);
-
-  // useEffect(() => {
-  //   if (tasks.length > prevTaskCountRef.current && canScroll) {
-  //     // Only scroll if a task was added
-  //     // endRef.current?.scrollIntoView({ behavior: "smooth" });
-  //   }
-
-  //   // Update previous task count for next comparison
-  //   prevTaskCountRef.current = tasks.length;
-  // }, [tasks.length]);
-
-  // useEffect(() => {
-  //   setCanScroll(true);
-  // }, []);
+  useEffect(() => {
+    if (prevNumOfTasks.current !== 0 && prevNumOfTasks.current < tasks.length) {
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    prevNumOfTasks.current = tasks.length; // <-- Update ref
+  }, [tasks.length]);
 
   return (
     <>
