@@ -45,6 +45,7 @@ export type TaskBoardProps = {
     boardType: boardType
   ) => void;
   boardType: boardType;
+  endRef?: React.RefObject<HTMLDivElement>; // 👈 Add this
 };
 
 export type Task = {

@@ -38,6 +38,7 @@ function getCookie(name: string) {
   }
   return null;
 }
+
 const LAST_ACTIVE_BOARD = getCookie("lastActiveBoard");
 
 export default function MainBoard() {
@@ -59,51 +60,70 @@ export default function MainBoard() {
 
   const fadeRef = useRef<HTMLDivElement | null>(null);
 
+  // fetch data from Firestore, then fetch from localStorage if the first fails
+  // delay of two seconds to give Firebase time to authenticate user and return data
+
   useEffect(() => {
+    let fallbackTimeout: NodeJS.Timeout;
+
     if (user) {
+      // If user is available, fetch from Firestore
       const fetchTasks = async () => {
-        const todoSnapshot = await getDocs(
-          collection(db, "users", user.uid, "todo")
-        );
-        const doneSnapshot = await getDocs(
-          collection(db, "users", user.uid, "done")
-        );
-        setTodoTasks(
-          todoSnapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              ...data,
-              createdAt: data.createdAt?.toDate?.() ?? new Date(), // fallback for missing timestamp
-            } as Task;
-          })
-        );
-        setDoneTasks(
-          doneSnapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              ...data,
-              createdAt: data.createdAt?.toDate?.() ?? new Date(), // fallback for missing timestamp
-            } as Task;
-          })
-        );
+        try {
+          const todoSnapshot = await getDocs(
+            collection(db, "users", user.uid, "todo")
+          );
+          const doneSnapshot = await getDocs(
+            collection(db, "users", user.uid, "done")
+          );
+          setTodoTasks(
+            todoSnapshot.docs.map((doc) => {
+              const data = doc.data();
+              return {
+                ...data,
+                createdAt: data.createdAt?.toDate?.() ?? new Date(),
+              } as Task;
+            })
+          );
+          setDoneTasks(
+            doneSnapshot.docs.map((doc) => {
+              const data = doc.data();
+              return {
+                ...data,
+                createdAt: data.createdAt?.toDate?.() ?? new Date(),
+              } as Task;
+            })
+          );
+        } catch (error) {
+          console.error("Failed to fetch from Firestore", error);
+        }
       };
+
       fetchTasks();
-    } else if (!user) {
-      const TODO_LIST = JSON.parse(
-        localStorage.getItem("todo_list") ?? JSON.stringify([])
-      ).map((t: { createdAt: string | number | Date }) => ({
-        ...t,
-        createdAt: new Date(t.createdAt),
-      }));
-      const DONE_LIST = JSON.parse(
-        localStorage.getItem("done_list") ?? JSON.stringify([])
-      ).map((t: { createdAt: string | number | Date }) => ({
-        ...t,
-        createdAt: new Date(t.createdAt),
-      }));
-      setTodoTasks(TODO_LIST);
-      setDoneTasks(DONE_LIST);
+    } else {
+      // Wait 2 seconds before falling back to localStorage
+      fallbackTimeout = setTimeout(() => {
+        if (!user) {
+          const TODO_LIST = JSON.parse(
+            localStorage.getItem("todo_list") ?? JSON.stringify([])
+          ).map((t: { createdAt: string | number | Date }) => ({
+            ...t,
+            createdAt: new Date(t.createdAt),
+          }));
+          const DONE_LIST = JSON.parse(
+            localStorage.getItem("done_list") ?? JSON.stringify([])
+          ).map((t: { createdAt: string | number | Date }) => ({
+            ...t,
+            createdAt: new Date(t.createdAt),
+          }));
+          setTodoTasks(TODO_LIST);
+          setDoneTasks(DONE_LIST);
+        }
+      }, 2000);
     }
+
+    // Cleanup: clear timeout if user becomes available or component unmounts
+    return () => clearTimeout(fallbackTimeout);
   }, [user]);
 
   const addTask = async (
@@ -235,7 +255,7 @@ export default function MainBoard() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ?? null);
-      console.log("Auth state changed:", user);
+      // console.log("Auth state changed:", user);
     });
 
     return () => unsubscribe();

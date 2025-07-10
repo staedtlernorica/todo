@@ -10,19 +10,13 @@ export default function TaskBoard({
   updateTaskStatus,
 }: TaskBoardProps) {
   const endRef = useRef<HTMLDivElement | null>(null);
-  const prevTaskCountRef = useRef<number>(tasks.length);
-
-  // const bottomFade =
-  // ("[-webkit-mask-image:linear-gradient(180deg,#000_60%,transparent)]");
+  const prevNumOfTasks = useRef(tasks.length);
 
   useEffect(() => {
-    if (tasks.length > prevTaskCountRef.current) {
-      // Only scroll if a task was added
+    if (prevNumOfTasks.current !== 0 && prevNumOfTasks.current < tasks.length) {
       endRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-
-    // Update previous task count for next comparison
-    prevTaskCountRef.current = tasks.length;
+    prevNumOfTasks.current = tasks.length; // <-- Update ref
   }, [tasks.length]);
 
   return (
@@ -40,7 +34,8 @@ export default function TaskBoard({
             updateTaskStatus={updateTaskStatus}
           />
         ))}
-        <div ref={endRef} /> {/* Scroll target */}
+        <div ref={endRef} />
+        {/* Scroll target */}
       </Box>
     </>
   );
