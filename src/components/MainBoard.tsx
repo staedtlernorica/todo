@@ -405,7 +405,7 @@ export default function MainBoard() {
             />
 
             <NewTask addTask={addTask} boardType={activeBoard} />
-            <Box className="z-100 bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
+            <Box className="z-100 bg-gray-100 p-4 text-center shadow gap-2 bottom-0 flex justify-center">
               <Button
                 variant={activeBoard === "todo" ? "contained" : "outlined"}
                 onClick={() => handleBoardChange("todo")}

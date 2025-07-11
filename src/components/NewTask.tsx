@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+// import { useEffect } from "react";
 import { Box, Button, TextField } from "@mui/material";
 import type { NewTaskProps, InputChangeEvent } from "../types";
 import AddTaskIcon from "@mui/icons-material/AddTask";
