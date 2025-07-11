@@ -254,7 +254,7 @@ export default function MainBoard() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ?? null);
-      // console.log("Auth state changed:", user);
+      console.log("Auth state changed:", user);
     });
 
     return () => unsubscribe();
@@ -396,7 +396,7 @@ export default function MainBoard() {
             </Slide>
           </Box>
 
-          <Box className="bg-gray-100 fixed mt-5 bottom-8 w-full h-[100px]">
+          <Box className="bg-gray-100 fixed mt-5 bottom-5 w-full h-[100px]">
             <Box className="fade-container"></Box>
             <Box
               className={`bottom-gradient ${
@@ -405,14 +405,16 @@ export default function MainBoard() {
             />
 
             <NewTask addTask={addTask} boardType={activeBoard} />
-            <Box className="z-100 bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
+            <Box className="z-100 bg-gray-100 p-4 text-center shadow gap-2 bottom-0 flex justify-center">
               <Button
+                size="large"
                 variant={activeBoard === "todo" ? "contained" : "outlined"}
                 onClick={() => handleBoardChange("todo")}
               >
                 To Do
               </Button>
               <Button
+                size="large"
                 variant={activeBoard === "done" ? "contained" : "outlined"}
                 onClick={() => handleBoardChange("done")}
               >

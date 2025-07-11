@@ -50,7 +50,7 @@ export default function Task({
   };
 
   return (
-    <Box className="h-12" ref={containerRef}>
+    <Box className="h-10.5" ref={containerRef}>
       <Slide
         in={switchVisibility}
         mountOnEnter
@@ -67,9 +67,9 @@ export default function Task({
           timeout={delTransitionTiming}
           onExited={() => deleteTask(taskId, taskStatus)}
         >
-          <Box className="flex items-center justify-center m-3 mt-0">
-            <Typography className="mr-5 font-bold h-6 w-6 text-center rounded-full">
-              {index + 1}.
+          <Box className="flex items-center justify-center m-3 mt-2">
+            <Typography className="mr-3 font-bold h-6 w-6 text-center rounded-full">
+              {index + 1 + ")"}
             </Typography>
             {TaskInput(handleInputChange, taskValue)}
             {TaskSwitch(handleSwitch, taskStatus)}
@@ -85,21 +85,41 @@ function TaskInput(
   handleInputChange: (e: InputChangeEvent) => void,
   taskValue: string
 ) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyClick = async () => {
+    try {
+      await navigator.clipboard.writeText(taskValue);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 500);
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
+
   return (
     <>
       <TextField
-        className="max-w-80 flex-2"
+        className="max-w-80 flex-2 p-0"
         variant="standard"
         value={taskValue}
         onChange={handleInputChange}
-        style={{ margin: "10px 0" }}
-      ></TextField>
-      <ContentCopyIcon
-        // className="absolute right-2 top-1/2 transform -translate-y-1/2"
-        className="h-6.5 w-6.5 bottom-1.5 right-7 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
-        onClick={() => {
-          navigator.clipboard.writeText(taskValue);
+        inputProps={{
+          className: "m-0 p-0 pb-0.5", // or "text-right", etc.
         }}
+
+        // style={{ margin: "10px 0" }}
+      />
+      <ContentCopyIcon
+        onClick={handleCopyClick}
+        className={`ml-2 h-5.5 w-5.5 cursor-pointer transition-all duration-200
+          ${
+            copied
+              ? "text-blue-800 translate-y-[1px]"
+              : "text-blue-400 hover:text-blue-600"
+          }
+        `}
+        titleAccess={copied ? "Copied!" : "Copy to clipboard"}
       />
     </>
   );
@@ -110,22 +130,28 @@ function TaskSwitch(
 ) {
   return (
     <Button
-      className="ml-3 mr-1 rounded-full h-8 w-8 min-w-0"
+      className="ml-3 mr-1 rounded-full h-6.5 w-6.5 min-w-0"
       variant="contained"
       onClick={handleSwitch}
+      size="small"
     >
-      {taskStatus == "done" ? <UndoIcon></UndoIcon> : <DoneIcon></DoneIcon>}
+      {taskStatus == "done" ? (
+        <UndoIcon className="w-5" />
+      ) : (
+        <DoneIcon className="w-5" />
+      )}
     </Button>
   );
 }
 function TaskDelete(handleDelete: () => void) {
   return (
     <Button
-      className=" rounded-full h-8 w-8 min-w-0"
+      className=" rounded-full h-6.5 w-6.5 min-w-0"
       variant="contained"
       onClick={handleDelete}
+      size="small"
     >
-      <DeleteIcon />
+      <DeleteIcon className="w-5" />
     </Button>
   );
 }
