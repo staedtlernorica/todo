@@ -38,7 +38,7 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
       ></TextField>
 
       <Button
-        className="ml-5 h-10 w-10 min-w-0"
+        className="ml-5 h-10 w-10 min-w-0 rounded-full"
         variant="contained"
         onClick={handleAddTask}
       >
