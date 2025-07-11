@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import TaskBoard from "./TaskBoard";
 import { Box, Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
@@ -55,10 +55,9 @@ export default function MainBoard() {
     const date = new Date();
     date.setTime(date.getTime() + 365 * 24 * 60 * 60 * 1000);
     document.cookie = `lastActiveBoard=${e}; expires=${date.toUTCString()}; path=/`;
+    handleScroll();
     return e;
   }
-
-  const fadeRef = useRef<HTMLDivElement | null>(null);
 
   // fetch data from Firestore, then fetch from localStorage if the first fails
   // delay of two seconds to give Firebase time to authenticate user and return data
@@ -287,34 +286,67 @@ export default function MainBoard() {
       });
   }, []);
 
-  // Intersection Observer effect to remove/add fade container class
-  useEffect(() => {
-    const sentinel = document.getElementById("scroll-sentinel");
-    const fadeContainer = fadeRef.current;
+  // ===============================================================
+  // ✅ No unnecessary state updates > prevent unnecessary re-renders
+  // ✅ Throttled scroll handler (100ms delay) > reduce CPU usage
+  // ✅ passive: true for smooth scrolling > improve mobile scroll performance
 
-    if (!sentinel || !fadeContainer) return;
+  function useThrottledCallback<T extends (...args: any[]) => void>(
+    callback: T,
+    delay: number
+  ): (...args: Parameters<T>) => void {
+    const lastCall = useRef(0);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            fadeContainer.classList.remove("more-entries-fade-container");
-          } else {
-            fadeContainer.classList.add("more-entries-fade-container");
-          }
-        });
+    return useCallback(
+      (...args: Parameters<T>) => {
+        const now = Date.now();
+        if (now - lastCall.current >= delay) {
+          lastCall.current = now;
+          callback(...args);
+        }
       },
-      {
-        root: null,
-        rootMargin: "0px 0px -20px 0px",
-        threshold: 1,
-      }
+      [callback, delay]
     );
+  }
 
-    observer.observe(sentinel);
+  const [hideGradient, setHideGradient] = useState(false);
 
-    return () => observer.disconnect();
+  const handleScroll = useCallback(() => {
+    const scrollTop = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const fullHeight = document.documentElement.scrollHeight;
+    const threshold = 10;
+
+    const scrolledNearBottom =
+      scrollTop + windowHeight >= fullHeight - threshold;
+
+    setHideGradient((prev) => {
+      if (prev !== scrolledNearBottom) {
+        return scrolledNearBottom;
+      }
+      return prev;
+    });
   }, []);
+
+  const throttledScroll = useThrottledCallback(handleScroll, 20);
+
+  useEffect(() => {
+    window.addEventListener("scroll", throttledScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", throttledScroll);
+    };
+  }, [throttledScroll, handleScroll]);
+
+  // sets bottom fade gradient AFTER data has been loaded from firestore
+  useEffect(() => {
+    // requestAnimationFrame ensures that DOM updates from React are flushed
+    // before we read scroll values — making scrollHeight accurate.
+    requestAnimationFrame(() => {
+      handleScroll();
+    });
+  }, [todoTasks, doneTasks]);
+
+  // ===============================================================
 
   return (
     <>
@@ -333,7 +365,7 @@ export default function MainBoard() {
               mountOnEnter
               unmountOnExit
             >
-              <Box className="absolute w-full pt-5 pb-35">
+              <Box className="absolute w-full pt-5 pb-35 ">
                 <TaskBoard
                   tasks={todoTasks}
                   boardType="todo"
@@ -351,7 +383,7 @@ export default function MainBoard() {
               mountOnEnter
               unmountOnExit
             >
-              <Box className="absolute w-full pt-5 pb-35">
+              <Box className="absolute w-full pt-5 pb-35 ">
                 <TaskBoard
                   tasks={doneTasks}
                   boardType="done"
@@ -364,12 +396,16 @@ export default function MainBoard() {
             </Slide>
           </Box>
 
-          <Box
-            ref={fadeRef}
-            className="bg-gray-100 more-entries-fade-container fixed mt-5 bottom-8 w-full h-[100px]"
-          >
+          <Box className="bg-gray-100 fixed mt-5 bottom-8 w-full h-[100px]">
+            <Box className="fade-container"></Box>
+            <Box
+              className={`bottom-gradient ${
+                hideGradient ? "hide-gradient" : ""
+              }`}
+            />
+
             <NewTask addTask={addTask} boardType={activeBoard} />
-            <Box className="bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
+            <Box className="z-100 bg-gray-100 p-3.5 text-center shadow gap-2 bottom-0 flex justify-center">
               <Button
                 variant={activeBoard === "todo" ? "contained" : "outlined"}
                 onClick={() => handleBoardChange("todo")}
@@ -384,9 +420,6 @@ export default function MainBoard() {
               </Button>
             </Box>
           </Box>
-
-          {/* Sentinel div for intersection observer */}
-          <Box id="scroll-sentinel" className="h-[1px] w-full" />
         </Box>
       </Box>
     </>
