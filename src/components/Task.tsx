@@ -67,7 +67,7 @@ export default function Task({
           timeout={delTransitionTiming}
           onExited={() => deleteTask(taskId, taskStatus)}
         >
-          <Box className="flex items-center justify-center m-3 mt-0">
+          <Box className="flex items-center justify-center m-3 mt-2">
             <Typography className="mr-3 font-bold h-6 w-6 text-center rounded-full">
               {index + 1 + ")"}
             </Typography>
@@ -105,7 +105,7 @@ function TaskInput(
         value={taskValue}
         onChange={handleInputChange}
         inputProps={{
-          className: "m-0 p-0", // or "text-right", etc.
+          className: "m-0 p-0 pb-0.5", // or "text-right", etc.
         }}
 
         // style={{ margin: "10px 0" }}
@@ -130,22 +130,28 @@ function TaskSwitch(
 ) {
   return (
     <Button
-      className="ml-3 mr-1 rounded-full h-8 w-8 min-w-0"
+      className="ml-3 mr-1 rounded-full h-6.5 w-6.5 min-w-0"
       variant="contained"
       onClick={handleSwitch}
+      size="small"
     >
-      {taskStatus == "done" ? <UndoIcon></UndoIcon> : <DoneIcon></DoneIcon>}
+      {taskStatus == "done" ? (
+        <UndoIcon className="w-5" />
+      ) : (
+        <DoneIcon className="w-5" />
+      )}
     </Button>
   );
 }
 function TaskDelete(handleDelete: () => void) {
   return (
     <Button
-      className=" rounded-full h-8 w-8 min-w-0"
+      className=" rounded-full h-6.5 w-6.5 min-w-0"
       variant="contained"
       onClick={handleDelete}
+      size="small"
     >
-      <DeleteIcon />
+      <DeleteIcon className="w-5" />
     </Button>
   );
 }
