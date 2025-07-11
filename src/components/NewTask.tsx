@@ -29,8 +29,8 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
   return (
     <Box className="pt-3 w-full bg-gray-100 flex justify-center items-center">
       <TextField
-        className="p0 m0"
-        variant="filled"
+        className="p0 m0 w-[45%]"
+        variant="standard"
         placeholder="Add new task"
         value={newTask}
         onChange={handleInputChange}
