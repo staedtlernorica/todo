@@ -85,6 +85,18 @@ function TaskInput(
   handleInputChange: (e: InputChangeEvent) => void,
   taskValue: string
 ) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyClick = async () => {
+    try {
+      await navigator.clipboard.writeText(taskValue);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 500);
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
+
   return (
     <>
       <TextField
@@ -93,13 +105,17 @@ function TaskInput(
         value={taskValue}
         onChange={handleInputChange}
         style={{ margin: "10px 0" }}
-      ></TextField>
+      />
       <ContentCopyIcon
-        // className="absolute right-2 top-1/2 transform -translate-y-1/2"
-        className="h-5 w-5 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
-        onClick={() => {
-          navigator.clipboard.writeText(taskValue);
-        }}
+        onClick={handleCopyClick}
+        className={`ml-2 h-5.5 w-5.5 cursor-pointer transition-all duration-200
+          ${
+            copied
+              ? "text-blue-800 translate-y-[1px]"
+              : "text-blue-400 hover:text-blue-600"
+          }
+        `}
+        titleAccess={copied ? "Copied!" : "Copy to clipboard"}
       />
     </>
   );

@@ -396,7 +396,7 @@ export default function MainBoard() {
             </Slide>
           </Box>
 
-          <Box className="bg-gray-100 fixed mt-5 bottom-7 w-full h-[100px]">
+          <Box className="bg-gray-100 fixed mt-5 bottom-5 w-full h-[100px]">
             <Box className="fade-container"></Box>
             <Box
               className={`bottom-gradient ${
