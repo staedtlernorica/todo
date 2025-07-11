@@ -10,11 +10,11 @@ export default function TaskBoard({
   updateTaskStatus,
 }: TaskBoardProps) {
   const prevNumOfTasks = useRef(tasks.length);
-  const thingRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (prevNumOfTasks.current !== 0 && prevNumOfTasks.current < tasks.length) {
-      thingRef.current?.scrollIntoView({ behavior: "smooth" });
+      scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }
     prevNumOfTasks.current = tasks.length; // <-- Update ref
   }, [tasks.length]);
@@ -36,7 +36,7 @@ export default function TaskBoard({
         ))}
       </Box>
 
-      <div ref={thingRef} />
+      <div ref={scrollRef} />
       {/* Scroll target */}
     </>
   );
