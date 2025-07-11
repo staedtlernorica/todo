@@ -96,7 +96,7 @@ function TaskInput(
       ></TextField>
       <ContentCopyIcon
         // className="absolute right-2 top-1/2 transform -translate-y-1/2"
-        className="h-6.5 w-6.5 bottom-1.5 right-7 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
+        className="h-5 w-5 text-blue-300 hover:cursor-pointer hover:bottom-0.25"
         onClick={() => {
           navigator.clipboard.writeText(taskValue);
         }}

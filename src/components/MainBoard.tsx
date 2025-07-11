@@ -254,7 +254,7 @@ export default function MainBoard() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ?? null);
-      // console.log("Auth state changed:", user);
+      console.log("Auth state changed:", user);
     });
 
     return () => unsubscribe();
