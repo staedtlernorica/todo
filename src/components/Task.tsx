@@ -50,7 +50,7 @@ export default function Task({
   };
 
   return (
-    <Box className="h-12" ref={containerRef}>
+    <Box className="h-10.5" ref={containerRef}>
       <Slide
         in={switchVisibility}
         mountOnEnter
@@ -68,8 +68,8 @@ export default function Task({
           onExited={() => deleteTask(taskId, taskStatus)}
         >
           <Box className="flex items-center justify-center m-3 mt-0">
-            <Typography className="mr-5 font-bold h-6 w-6 text-center rounded-full">
-              {index + 1}.
+            <Typography className="mr-3 font-bold h-6 w-6 text-center rounded-full">
+              {index + 1 + ")"}
             </Typography>
             {TaskInput(handleInputChange, taskValue)}
             {TaskSwitch(handleSwitch, taskStatus)}
@@ -100,11 +100,15 @@ function TaskInput(
   return (
     <>
       <TextField
-        className="max-w-80 flex-2"
+        className="max-w-80 flex-2 p-0"
         variant="standard"
         value={taskValue}
         onChange={handleInputChange}
-        style={{ margin: "10px 0" }}
+        inputProps={{
+          className: "m-0 p-0", // or "text-right", etc.
+        }}
+
+        // style={{ margin: "10px 0" }}
       />
       <ContentCopyIcon
         onClick={handleCopyClick}
