@@ -21,7 +21,7 @@ export default function SignIn({
   };
 
   return (
-    <Box className="h-[45px] items-center fixed z-10 opacity-100 bg-gray-100 w-full self-end flex justify-end gap-1 mr-1 md:mr-5 md:gap-5">
+    <Box className="top-0 h-[45px] items-center fixed z-10 opacity-100 bg-gray-100 w-full self-end flex justify-end gap-1 mr-1 md:mr-5 md:gap-5">
       {user ? (
         <>
           <Button>
