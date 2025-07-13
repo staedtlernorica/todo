@@ -50,7 +50,7 @@ export default function Task({
   };
 
   return (
-    <Box className="h-10.5" ref={containerRef}>
+    <Box className="" ref={containerRef}>
       <Slide
         in={switchVisibility}
         mountOnEnter
@@ -67,7 +67,7 @@ export default function Task({
           timeout={delTransitionTiming}
           onExited={() => deleteTask(taskId, taskStatus)}
         >
-          <Box className="flex items-center justify-center m-3 mt-2">
+          <Box className="flex items-center justify-center mx-2 mt-2">
             <Typography className="mr-3 font-bold h-6 w-6 text-center rounded-full">
               {index + 1 + ")"}
             </Typography>
@@ -104,8 +104,9 @@ function TaskInput(
         variant="standard"
         value={taskValue}
         onChange={handleInputChange}
+        multiline
         inputProps={{
-          className: "m-0 p-0 pb-0.5", // or "text-right", etc.
+          className: "m-0 p-0", // or "text-right", etc.
         }}
 
         // style={{ margin: "10px 0" }}
