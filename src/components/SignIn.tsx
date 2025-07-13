@@ -21,16 +21,22 @@ export default function SignIn({
   };
 
   return (
-    <Box className="h-[45px] items-center fixed z-10 opacity-100 bg-gray-100 w-full self-end flex justify-end gap-1 mr-1 md:mr-5 md:gap-5">
+    <Box className="top-0 h-[45px] items-center fixed z-10 opacity-100 bg-gray-100 w-full self-end flex justify-end gap-1 mr-1 md:mr-5 md:gap-5">
       {user ? (
         <>
           <Button>
-            <img
-              className="w-9 h-9 rounded-full hover:cursor-pointer"
-              src={user.photoURL ?? undefined}
-              onClick={handleClick}
-              alt="User Avatar"
-            />
+            {user && user.photoURL && (
+              <img
+                className="w-9 h-9 rounded-full hover:cursor-pointer"
+                src={user.photoURL}
+                onClick={handleClick}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/default-avatar.png";
+                }}
+                alt="User Avatar"
+              />
+            )}
           </Button>
 
           <Menu
