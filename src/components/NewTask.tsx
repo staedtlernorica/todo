@@ -26,10 +26,10 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
   };
 
   return (
-    <Box className="pt-3 w-full bg-gray-100 flex justify-center items-center">
-      <div className="relative">
+    <Box className=" pt-3 w-full bg-gray-100 flex justify-center items-center">
         <TextField
-          className="w-[45vw]"
+          className="w-[55%] ml-[32px]"
+          multiline
           variant="standard"
           placeholder="Add task"
           value={newTask}
@@ -38,13 +38,12 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
         />
 
         <Button
-          className="absolute left-full ml-[15px] h-10 w-10 min-w-0 rounded-full"
+          className="ml-[5px] h-8 w-8 min-w-0 rounded-full"
           variant="contained"
           onClick={handleAddTask}
         >
-          <AddTaskIcon />
+          <AddTaskIcon className="h-5"/>
         </Button>
-      </div>
     </Box>
   );
 }
