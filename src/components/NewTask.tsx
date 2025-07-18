@@ -13,6 +13,7 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       handleAddTask();
     }
   };
@@ -27,23 +28,23 @@ export default function NewTask({ addTask, boardType }: NewTaskProps) {
 
   return (
     <Box className=" pt-3 w-full bg-gray-100 flex justify-center items-center">
-        <TextField
-          className="w-[55%] ml-[32px]"
-          multiline
-          variant="standard"
-          placeholder="Add task"
-          value={newTask}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-        />
+      <TextField
+        className="w-[55%] ml-[32px]"
+        multiline
+        variant="standard"
+        placeholder="Add task"
+        value={newTask}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+      />
 
-        <Button
-          className="ml-[5px] h-8 w-8 min-w-0 rounded-full"
-          variant="contained"
-          onClick={handleAddTask}
-        >
-          <AddTaskIcon className="h-5"/>
-        </Button>
+      <Button
+        className="ml-[5px] h-8 w-8 min-w-0 rounded-full"
+        variant="contained"
+        onClick={handleAddTask}
+      >
+        <AddTaskIcon className="h-5" />
+      </Button>
     </Box>
   );
 }

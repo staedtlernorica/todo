@@ -100,14 +100,14 @@ function TaskInput(
   return (
     <>
       <TextField
-        className="max-w-80 flex-2 p-0"
+        className="max-w-80 flex-1"
         variant="standard"
         value={taskValue}
         onChange={handleInputChange}
         multiline
-        inputProps={{
-          className: "m-0 p-0", // or "text-right", etc.
-        }}
+        // inputProps={{
+        //   className: "m-0 p-0", // or "text-right", etc.
+        // }}
 
         // style={{ margin: "10px 0" }}
       />

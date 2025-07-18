@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import TaskBoard from "./TaskBoard";
-import { Box, Button } from "@mui/material";
+import SignIn from "./SignIn";
+import NewTask from "./NewTask";
+import BoardToggle from "./BoardToggle";
+import { Box } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import type { Task, boardType } from "../types";
 import Slide from "@mui/material/Slide";
-import NewTask from "./NewTask";
-import SignIn from "./SignIn";
 import {
   auth,
   provider,
@@ -397,30 +398,16 @@ export default function MainBoard() {
           </Box>
 
           <Box className="bg-gray-100 fixed mt-5 bottom-5 w-full h-[100px]">
-            <Box className="fade-container"></Box>
             <Box
               className={`bottom-gradient ${
                 hideGradient ? "hide-gradient" : ""
               }`}
             />
-
             <NewTask addTask={addTask} boardType={activeBoard} />
-            <Box className="z-100 bg-gray-100 p-5 text-center gap-2 bottom-0 flex justify-center">
-              <Button
-                size="large"
-                variant={activeBoard === "todo" ? "contained" : "outlined"}
-                onClick={() => handleBoardChange("todo")}
-              >
-                To Do
-              </Button>
-              <Button
-                size="large"
-                variant={activeBoard === "done" ? "contained" : "outlined"}
-                onClick={() => handleBoardChange("done")}
-              >
-                Done
-              </Button>
-            </Box>
+            <BoardToggle
+              activeBoard={activeBoard}
+              onBoardChange={handleBoardChange}
+            />
           </Box>
         </Box>
       </Box>
