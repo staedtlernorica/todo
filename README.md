@@ -44,7 +44,7 @@ Just visit the URL and start jotting things down — instantly.
 ---
 
 ## 🛠️ Tech Stack
-- **Frontend**: React, Material UI  
+- **Frontend**: React, Material UI, Tailwind CSS, TypeScript
 - **Authentication & Sync**: Firebase Auth + Firestore  
 - **Storage**: Browser `localStorage` and optional Firebase sync
 
